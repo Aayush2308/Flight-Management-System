@@ -39,7 +39,7 @@ public class App {
                     frame.revalidate();
                     frame.repaint();
                 };
-                frame.add(new EmployeePage());
+                frame.add(new HomePage());
                 frame.setVisible(true);
             });
         } catch (Exception e) {
