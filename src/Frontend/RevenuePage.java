@@ -1,9 +1,15 @@
 package Frontend;
 
+import Models.Revenue;
+import Service.RevenueService;
+import Components.NavigationBar;
+import Components.ShadowBorder;
+import Components.StyledButton;
 import DBConnection.DBConnection;
 import java.awt.*;
 import java.sql.*;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -20,6 +26,8 @@ public class RevenuePage extends JPanel {
     private JPanel bottomPanel;
     private JPanel contentWrapper;
 
+    private RevenueService revenueService;
+
     // Design constants
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
@@ -31,12 +39,18 @@ public class RevenuePage extends JPanel {
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
 
     public RevenuePage() {
-        setupMainPanel();
-        createComponents();
-        layoutComponents();
-        setupListeners();
-        initializeData();
-    }
+        try{
+            revenueService = new RevenueService();
+            setupMainPanel();
+            createComponents();
+            layoutComponents();
+            setupListeners();
+            initializeData();
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(this, "Error initializing RevenuePage: " + e.getMessage());
+            e.printStackTrace();
+        }
+    } 
 
     private void setupMainPanel() {
         setLayout(new BorderLayout(15, 15));
@@ -75,74 +89,14 @@ public class RevenuePage extends JPanel {
     }
 
     private void createNavbar() {
-        JPanel navbar = new JPanel(new BorderLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gradient = new GradientPaint(
-                    0, 0, PRIMARY_COLOR,
-                    getWidth(), 0, SECONDARY_COLOR
-                );
-                g2d.setPaint(gradient);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-                g2d.dispose();
-            }
-        };
-        navbar.setPreferredSize(new Dimension(Integer.MAX_VALUE, 70));
-
-        // Navigation buttons
-        JPanel navButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        navButtons.setOpaque(false);
-        
-        JButton backButton = createNavButton("←");
-        JButton forwardButton = createNavButton("→");
-        
-        navButtons.add(backButton);
-        navButtons.add(forwardButton);
-
-        // Title
-        JLabel title = new JLabel("Revenue Dashboard", SwingConstants.CENTER);
-        title.setFont(TITLE_FONT);
-        title.setForeground(Color.WHITE);
-
-        navbar.add(navButtons, BorderLayout.WEST);
-        navbar.add(title, BorderLayout.CENTER);
-        contentWrapper.add(navbar);
-    }
-
-    private JButton createNavButton(String text) {
-        JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                if (getModel().isPressed()) {
-                    g2d.setColor(ACCENT_COLOR.darker());
-                } else if (getModel().isRollover()) {
-                    g2d.setColor(ACCENT_COLOR);
-                } else {
-                    g2d.setColor(new Color(255, 255, 255, 80));
-                }
-                
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                g2d.setColor(Color.WHITE);
-                g2d.setFont(HEADER_FONT);
-                FontMetrics fm = g2d.getFontMetrics();
-                g2d.drawString(text, 
-                    (getWidth() - fm.stringWidth(text)) / 2,
-                    (getHeight() + fm.getAscent() - fm.getDescent()) / 2
-                );
-                g2d.dispose();
-            }
-        };
-        button.setPreferredSize(new Dimension(45, 45));
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return button;
+        NavigationBar navbar = new NavigationBar("Revenue Dashboard", e -> {
+        // Handle navigation button clicks
+        String command = ((JButton)e.getSource()).getText();
+        if ("←".equals(command)) {
+            // Handle back action
+        }
+    },70);
+    contentWrapper.add(navbar);
     }
 
     private void createSearchSection() {
@@ -333,72 +287,38 @@ public class RevenuePage extends JPanel {
     }
         
     private void fetchAndDisplayRevenue(String filterType, Object value1, Object value2) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
         try {
-            conn = DBConnection.getConnection();
-            String sql = "SELECT transactionId, amount, paymentType, ticketNumber FROM Revenue";
-        
-            if ("PaymentType".equals(filterType)) {
-                sql += " WHERE paymentType = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, value1.toString());
-            } else if ("Amount".equals(filterType)) {
-                sql += " WHERE amount BETWEEN ? AND ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setDouble(1, (Double) value1);
-                pstmt.setDouble(2, (Double) value2);
-            } else {
-                pstmt = conn.prepareStatement(sql);
-            }
-        
-            rs = pstmt.executeQuery();
-        
+            List<Revenue> revenues = revenueService.getRevenueData(filterType, value1, value2);
+            double totalRevenue = revenueService.calculateTotalRevenue(revenues);
+            
+            // Update table model
             String[] columns = {"Transaction ID", "Amount", "Payment Type", "Ticket Number"};
             DefaultTableModel model = new DefaultTableModel(columns, 0);
-            revenueTable.setModel(model);
-        
-            double totalRevenue = 0;
-        
-            while (rs.next()) {
-                int transactionId = rs.getInt("transactionId");
-                double amount = rs.getDouble("amount");
-                String paymentType = rs.getString("paymentType");
-                String ticketNumber = rs.getString("ticketNumber");
-        
-                model.addRow(new Object[]{transactionId, amount, paymentType, ticketNumber});
-                totalRevenue += amount;
+            
+            for (Revenue revenue : revenues) {
+                model.addRow(new Object[]{
+                    revenue.getTransactionId(),
+                    revenue.getAmount(),
+                    revenue.getPaymentType(),
+                    revenue.getTicketNumber()
+                });
             }
-        
+            
+            revenueTable.setModel(model);
+            
+            // Update summary
             bottomPanel.removeAll();
-            JLabel totalRevenueLabel = new JLabel("Total Revenue: ₹" + totalRevenue);
-            totalRevenueLabel.setForeground(new Color(0, 102, 204));
-            totalRevenueLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+            JLabel totalRevenueLabel = new JLabel("Total Revenue: " + 
+                CURRENCY_FORMAT.format(totalRevenue));
+            totalRevenueLabel.setForeground(PRIMARY_COLOR);
+            totalRevenueLabel.setFont(HEADER_FONT);
             bottomPanel.add(totalRevenueLabel);
-        
-            revenueTable.setFont(new Font("SansSerif", Font.PLAIN, 14));
-            revenueTable.setRowHeight(25);
-        
-            JTableHeader header = revenueTable.getTableHeader();
-            header.setFont(new Font("SansSerif", Font.BOLD, 16));
-            header.setBackground(new Color(240, 240, 240));
-            header.setForeground(Color.BLACK);
-        
+            
             bottomPanel.revalidate();
             bottomPanel.repaint();
-        
+            
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (pstmt != null) pstmt.close();
-                DBConnection.closeConnection();
-            } catch (SQLException e) {
-                System.err.println("Error closing DB: " + e.getMessage());
-            }
         }
     }
 

@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
-public class Passenger extends JFrame {
+public class PassengerPage extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JTable table;
@@ -31,7 +31,7 @@ public class Passenger extends JFrame {
     private final Font font = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font titleFont = new Font("Segoe UI Semibold", Font.BOLD, 24);
 
-    public Passenger() {
+    public PassengerPage() {
         setTitle("✈ Passenger Management - Flight Management System");
         setSize(1100, 650);  // Slightly larger for better spacing
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -421,15 +421,8 @@ public class Passenger extends JFrame {
                 cardLayout.show(mainPanel, "DetailView");
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(Passenger.this, "Error retrieving passenger details.");
+                JOptionPane.showMessageDialog(PassengerPage.this, "Error retrieving passenger details.");
             }
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Passenger passenger = new Passenger();
-            passenger.setVisible(true);
-        });
     }
 }

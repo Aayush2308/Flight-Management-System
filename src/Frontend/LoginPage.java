@@ -1,12 +1,11 @@
 package Frontend;
 
-import DBConnection.DBConnection;
 import Models.Account;
 import Service.AuthService;
-import Service.NavigationListener;
 import Utilities.PlaceholderUtils;
-
 import javax.swing.*;
+import Components.LoginNavigationBar;
+import Interfaces.NavigationListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
@@ -16,6 +15,7 @@ public class LoginPage extends JPanel {
     private JPasswordField passwordField;
     private NavigationListener navigationListener;
     private AuthService authService;
+    private LoginNavigationBar navBar;
 
     public LoginPage(NavigationListener listener) {
         this.navigationListener = listener;
@@ -24,51 +24,71 @@ public class LoginPage extends JPanel {
     }
 
     private void initializeUI() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
-
+        setLayout(new BorderLayout());
+    
+        navBar = new LoginNavigationBar("Login", this::handleNavActions, 70);
+        add(navBar, BorderLayout.NORTH);
+    
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 50, 50));
+    
         // Email Field
         emailField = new JTextField("Email");
         emailField.setMaximumSize(new Dimension(300, 40));
         emailField.setForeground(Color.GRAY);
         PlaceholderUtils.addPlaceholderStyle(emailField);
-        add(emailField);
-        add(Box.createRigidArea(new Dimension(0, 10)));
-
+        contentPanel.add(emailField);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
         // Password Field
         passwordField = new JPasswordField("Password");
         passwordField.setEchoChar((char) 0);
         passwordField.setMaximumSize(new Dimension(300, 40));
         passwordField.setForeground(Color.GRAY);
         PlaceholderUtils.addPlaceholderStyle(passwordField);
-        add(passwordField);
-        add(Box.createRigidArea(new Dimension(0, 20)));
-
+        contentPanel.add(passwordField);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+    
         // Login Button
         JButton loginButton = new JButton("Login");
         loginButton.addActionListener(e -> loginUser());
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(loginButton);
-        add(Box.createRigidArea(new Dimension(0, 20)));
+        contentPanel.add(loginButton);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Register Label
-        JLabel registerLabel = new JLabel("<HTML><U>Register an account</U></HTML>");
-        registerLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
+        // Login Button
+        JButton registerButton = new JButton("Register An Account");
+        registerButton.setContentAreaFilled(false); 
+        registerButton.setBorderPainted(false);     
+        registerButton.setFocusPainted(false); 
+        registerButton.setOpaque(false);        
+        registerButton.setForeground(Color.BLUE);  
+        registerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        registerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        registerButton.addActionListener(e -> {
+            if (navigationListener != null) {
                 navigationListener.navigateTo("signup");
             }
         });
-        
-        registerLabel.setForeground(Color.BLUE);
-        registerLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        registerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        registerLabel.setPreferredSize(new Dimension(100, 20));
-        add(registerLabel);
-
+        contentPanel.add(registerButton);
+        add(contentPanel, BorderLayout.CENTER);
+    
+        // Placeholder handlers
         PlaceholderUtils.addPlaceholderListeners(emailField, "Email");
         PlaceholderUtils.addPlaceholderListeners(passwordField, "Password");
     }
+
+    private void handleNavActions(ActionEvent e) {
+        String command = ((JButton)e.getSource()).getText();
+        if ("←".equals(command)) {
+            if (navigationListener != null) {
+                navigationListener.navigateTo("welcome"); // or wherever you want to go
+            }
+        }
+    }
+    
 
     private void loginUser() {
         String email = emailField.getText().trim();
@@ -80,8 +100,8 @@ public class LoginPage extends JPanel {
         }
 
         try {
-            Account user = authService.authenticate(email, password);
-            if (user != null) {
+            Account account = authService.authenticate(email, password);
+            if (account != null) {
                 JOptionPane.showMessageDialog(this, "Login successful!");
                 // navigationListener.navigateTo("dashboard");
             } else {
