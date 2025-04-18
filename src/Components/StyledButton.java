@@ -38,6 +38,7 @@ public class StyledButton extends JButton {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(getBackground());
+
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
         g2d.setColor(Color.WHITE);
         g2d.setFont(getFont());

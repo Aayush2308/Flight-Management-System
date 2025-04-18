@@ -6,6 +6,8 @@ import Components.NavigationBar;
 import Components.ShadowBorder;
 import Components.StyledButton;
 import DBConnection.DBConnection;
+import Interfaces.NavigationListener;
+
 import java.awt.*;
 import java.sql.*;
 import java.text.NumberFormat;
@@ -16,6 +18,8 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 public class RevenuePage extends JPanel {
+    private int adminId;
+    private NavigationListener navigationListener;
     // Component declarations
     private JTable revenueTable;
     private JComboBox<String> searchTypeComboBox;
@@ -38,8 +42,10 @@ public class RevenuePage extends JPanel {
     private static final Font REGULAR_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
 
-    public RevenuePage() {
+    public RevenuePage(int adminId, NavigationListener navigationListener) {
         try{
+            this.adminId = adminId;
+            this.navigationListener = navigationListener;
             revenueService = new RevenueService();
             setupMainPanel();
             createComponents();
@@ -63,7 +69,7 @@ public class RevenuePage extends JPanel {
         contentWrapper = new JPanel();
         contentWrapper.setLayout(new BoxLayout(contentWrapper, BoxLayout.Y_AXIS));
         contentWrapper.setBackground(Color.WHITE);
-        contentWrapper.setBorder(createShadowBorder());
+        contentWrapper.setBorder(ShadowBorder.createShadowBorder());
 
         // Create navbar
         createNavbar();
@@ -78,22 +84,14 @@ public class RevenuePage extends JPanel {
         createSummarySection();
     }
 
-    private Border createShadowBorder() {
-        return BorderFactory.createCompoundBorder(
-            new EmptyBorder(5, 5, 5, 5),
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(0, 0, 0, 20), 1),
-                new EmptyBorder(10, 15, 10, 15)
-            )
-        );
-    }
-
     private void createNavbar() {
         NavigationBar navbar = new NavigationBar("Revenue Dashboard", e -> {
         // Handle navigation button clicks
         String command = ((JButton)e.getSource()).getText();
         if ("←".equals(command)) {
-            // Handle back action
+            if(navigationListener != null){
+                navigationListener.navigateTo(new HomePage(adminId, navigationListener));
+            }
         }
     },70);
     contentWrapper.add(navbar);

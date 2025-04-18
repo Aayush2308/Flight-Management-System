@@ -5,7 +5,7 @@ import javax.swing.border.*;
 import java.awt.*;
 
 public class ShadowBorder {
-    public static Border create() {
+    public static Border createShadowBorder() {
         return BorderFactory.createCompoundBorder(
             new EmptyBorder(5, 5, 5, 5),
             BorderFactory.createCompoundBorder(

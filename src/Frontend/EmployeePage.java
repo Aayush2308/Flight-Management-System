@@ -1,6 +1,8 @@
 package Frontend;
 
 import DBConnection.DBConnection;
+import Interfaces.NavigationListener;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -17,7 +19,7 @@ public class EmployeePage extends JPanel {
     private Integer currentSearchId = null;
     private JButton backButton;
 
-    public EmployeePage() {
+    public EmployeePage(int adminId, NavigationListener navigationListener) {
         setLayout(new BorderLayout());
 
         // --- Top panel: Search, Sort controls + CRUD buttons ---
@@ -64,9 +66,9 @@ public class EmployeePage extends JPanel {
 
         // --- Listeners ---
         backButton.addActionListener(e -> {
-            currentSearchId = null;
-            searchField.setText(""); // Clear the search field
-            fetchAndDisplayEmployees((String) sortComboBox.getSelectedItem(), true); // Refresh full list
+            if (navigationListener != null) {
+                navigationListener.navigateTo(new HomePage(adminId, navigationListener));
+            }
         });
         sortAscButton.addActionListener(e -> fetchAndDisplayEmployees(
             (String) sortComboBox.getSelectedItem(), true));

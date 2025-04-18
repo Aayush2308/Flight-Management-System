@@ -33,13 +33,13 @@ public class App {
                                 contentPane.add(new SignupPage(this));
                                 break;
                             case "employee":
-                                contentPane.add(new EmployeePage());
+                                contentPane.add(new EmployeePage(0, this));
                                 break;
                             case "revenue":
-                                contentPane.add(new RevenuePage());
+                                contentPane.add(new RevenuePage(0, this));
                                 break;
                             case "passenger":
-                                contentPane.add(new PassengerPage());
+                                contentPane.add(new PassengerPage(0, this));
                                 break;
                             // case "flight":
                             //     contentPane.add(new FlightPage());
@@ -64,7 +64,7 @@ public class App {
                 };
 
                 // Initial screen
-                contentPane.add(new PassengerPage());
+                contentPane.add(new EmployeePage(1,listener[0]));
 
                 frame.setVisible(true);
             });

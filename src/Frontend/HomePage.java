@@ -186,11 +186,11 @@ public class HomePage extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (panelName.equals(PASSENGER_PANEL)) {
-                    navigationListener.navigateTo(new PassengerPage());
+                    navigationListener.navigateTo(new PassengerPage(adminId, navigationListener));
                 } else if (panelName.equals(EMPLOYEE_PANEL)) {
-                    navigationListener.navigateTo(new EmployeePage());
+                    navigationListener.navigateTo(new EmployeePage(adminId, navigationListener));
                 } else if (panelName.equals(REVENUE_PANEL)) {
-                    navigationListener.navigateTo(new EmployeePage());
+                    navigationListener.navigateTo(new RevenuePage(adminId, navigationListener));
                 } else if (panelName.equals(FLIGHT_PANEL)) {
                     navigationListener.navigateTo("flight");
                 }
