@@ -382,5 +382,3 @@ public class EmployeePage extends JPanel {
         fetchAndDisplayEmployees((String) sortComboBox.getSelectedItem(), true);
     }
 }
-
-
