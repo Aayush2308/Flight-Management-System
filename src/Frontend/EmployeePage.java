@@ -15,16 +15,18 @@ public class EmployeePage extends JPanel {
     private JPanel topPanel, bottomPanel;
     private JTextField searchField;
     private Integer currentSearchId = null;
+    private JButton backButton;
 
     public EmployeePage() {
         setLayout(new BorderLayout());
 
         // --- Top panel: Search, Sort controls + CRUD buttons ---
         topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        
         // Search components
         searchField = new JTextField(10);
         searchButton = new JButton("Search by ID");
+        backButton = new JButton("Back");
+        topPanel.add(backButton);
         topPanel.add(new JLabel("Search by ID:"));
         topPanel.add(searchField);
         topPanel.add(searchButton);
@@ -61,6 +63,11 @@ public class EmployeePage extends JPanel {
         fetchAndDisplayEmployees("employeeId", true);
 
         // --- Listeners ---
+        backButton.addActionListener(e -> {
+            currentSearchId = null;
+            searchField.setText(""); // Clear the search field
+            fetchAndDisplayEmployees((String) sortComboBox.getSelectedItem(), true); // Refresh full list
+        });
         sortAscButton.addActionListener(e -> fetchAndDisplayEmployees(
             (String) sortComboBox.getSelectedItem(), true));
         sortDescButton.addActionListener(e -> fetchAndDisplayEmployees(
