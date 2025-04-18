@@ -2,18 +2,15 @@ package Frontend;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
+import Interfaces.NavigationListener;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * HomePage class representing the main content panel of the Flight Management System (FMS).
- * It includes a navigation bar and a main content area with clickable cards
- * that navigate to different sections using CardLayout.
- */
-public class HomePage extends JPanel { // Changed from JFrame to JPanel
+public class HomePage extends JPanel {
 
-    // --- Constants ---
     private static final Color COLOR_BACKGROUND = new Color(45, 45, 45); // Dark gray background
     private static final Color COLOR_NAVBAR = new Color(30, 30, 30);      // Slightly darker navbar
     private static final Color COLOR_CARD = new Color(60, 60, 60);        // Card background
@@ -34,11 +31,15 @@ public class HomePage extends JPanel { // Changed from JFrame to JPanel
     // --- Components ---
     private JPanel mainContentPanel; // Panel holding the different views (cards or detail pages)
     private CardLayout cardLayout;   // Layout manager to switch between panels
+    private int adminId;
+    private NavigationListener navigationListener;
 
     /**
      * Constructor for the HomePage. Sets up the JPanel and initializes components.
      */
-    public HomePage() {
+    public HomePage(int adminId, NavigationListener navigationListener) {
+        this.adminId = adminId;
+        this.navigationListener = navigationListener;
         setLayout(new BorderLayout()); // Use BorderLayout for the main panel
         setBackground(COLOR_BACKGROUND); // Set background for the content pane
 
@@ -157,13 +158,6 @@ public class HomePage extends JPanel { // Changed from JFrame to JPanel
         return homePanel;
     }
 
-
-    /**
-     * Creates a clickable card panel.
-     * @param title The text to display on the card.
-     * @param panelName The name of the panel to navigate to (used by CardLayout).
-     * @return JPanel representing a clickable card.
-     */
     private JPanel createCard(String title, String panelName) {
         JPanel card = new JPanel(new BorderLayout()); // Use BorderLayout to center text
         card.setBackground(COLOR_CARD);
@@ -191,20 +185,21 @@ public class HomePage extends JPanel { // Changed from JFrame to JPanel
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Navigate to the corresponding panel
-                cardLayout.show(mainContentPanel, panelName);
+                if (panelName.equals(PASSENGER_PANEL)) {
+                    navigationListener.navigateTo(new PassengerPage());
+                } else if (panelName.equals(EMPLOYEE_PANEL)) {
+                    navigationListener.navigateTo(new EmployeePage());
+                } else if (panelName.equals(REVENUE_PANEL)) {
+                    navigationListener.navigateTo(new EmployeePage());
+                } else if (panelName.equals(FLIGHT_PANEL)) {
+                    navigationListener.navigateTo("flight");
+                }
             }
         });
 
         return card;
     }
 
-     /**
-     * Creates a simple placeholder panel for navigated-to sections.
-     * @param name The name/identifier of the panel.
-     * @param displayText The text to display on the panel.
-     * @return JPanel representing a placeholder page.
-     */
     private JPanel createPlaceholderPanel(String name, String displayText) {
         JPanel panel = new JPanel(new GridBagLayout()); // Use GridBagLayout to center content
         panel.setName(name); // Set the name for identification if needed later

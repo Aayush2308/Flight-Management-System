@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
-public class PassengerPage extends JFrame {
+public class PassengerPage extends JPanel {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JTable table;
@@ -32,22 +32,13 @@ public class PassengerPage extends JFrame {
     private final Font titleFont = new Font("Segoe UI Semibold", Font.BOLD, 24);
 
     public PassengerPage() {
-        setTitle("✈ Passenger Management - Flight Management System");
-        setSize(1100, 650);  // Slightly larger for better spacing
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(1100, 650));
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         mainPanel.setBackground(darkBg);
-        add(mainPanel);
+        add(mainPanel, BorderLayout.CENTER);
 
         initListPanel();
         initDetailsPanel();
@@ -57,8 +48,6 @@ public class PassengerPage extends JFrame {
 
         loadPassengers();
         cardLayout.show(mainPanel, "ListView");
-
-        setVisible(true);
     }
 
     private void initListPanel() {
@@ -191,17 +180,17 @@ public class PassengerPage extends JFrame {
                 cs.setString(2, name);
                 cs.setString(3, contact);
                 cs.execute();
-                JOptionPane.showMessageDialog(this, "Passenger added successfully.");
+                JOptionPane.showMessageDialog(PassengerPage.this, "Passenger added successfully.");
                 refreshPassengerList();
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error adding passenger.");
+                JOptionPane.showMessageDialog(PassengerPage.this, "Error adding passenger.");
             }
         });
 
         // Delete Passenger
         deleteBtn.addActionListener(e -> {
-            String ticket = JOptionPane.showInputDialog(this, "Enter Ticket Number to Delete:");
+            String ticket = JOptionPane.showInputDialog(PassengerPage.this, "Enter Ticket Number to Delete:");
             if (ticket == null || ticket.isEmpty()) return;
 
             try (Connection con = DBConnection.getConnection();
@@ -209,14 +198,14 @@ public class PassengerPage extends JFrame {
                 ps.setString(1, ticket);
                 int rows = ps.executeUpdate();
                 if (rows > 0) {
-                    JOptionPane.showMessageDialog(this, "Passenger deleted.");
+                    JOptionPane.showMessageDialog(PassengerPage.this, "Passenger deleted.");
                     refreshPassengerList();
                 } else {
-                    JOptionPane.showMessageDialog(this, "No passenger found.");
+                    JOptionPane.showMessageDialog(PassengerPage.this, "No passenger found.");
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error deleting passenger.");
+                JOptionPane.showMessageDialog(PassengerPage.this, "Error deleting passenger.");
             }
         });
     }
@@ -301,36 +290,14 @@ public class PassengerPage extends JFrame {
         
         return btn;
     }
-    // Add this helper method right after createButton
-    private Color brighter(Color color, float factor) {
-        int r = color.getRed();
-        int g = color.getGreen();
-        int b = color.getBlue();
-        
-        int i = (int)(1.0/(1.0-factor));
-        if (r == 0 && g == 0 && b == 0) {
-            return new Color(i, i, i);
-        }
-        if (r > 0 && r < i) r = i;
-        if (g > 0 && g < i) g = i;
-        if (b > 0 && b < i) b = i;
-    
-        return new Color(
-            Math.min((int)(r/factor), 255),
-            Math.min((int)(g/factor), 255),
-            Math.min((int)(b/factor), 255)
-        );
-    }
-    
-    
 
     private String inputValidated(String message, String regex, String errorMsg) {
         while (true) {
-            String input = JOptionPane.showInputDialog(this, message);
+            String input = JOptionPane.showInputDialog(PassengerPage.this, message);
             if (input == null) return null;
             input = input.trim();
             if (input.matches(regex)) return input;
-            JOptionPane.showMessageDialog(this, errorMsg);
+            JOptionPane.showMessageDialog(PassengerPage.this, errorMsg);
         }
     }
 
@@ -352,7 +319,7 @@ public class PassengerPage extends JFrame {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading passengers.");
+            JOptionPane.showMessageDialog(PassengerPage.this, "Error loading passengers.");
         }
     }
 

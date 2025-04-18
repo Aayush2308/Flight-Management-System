@@ -57,7 +57,7 @@ public class LoginPage extends JPanel {
         contentPanel.add(loginButton);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Login Button
+        // Register Button
         JButton registerButton = new JButton("Register An Account");
         registerButton.setContentAreaFilled(false); 
         registerButton.setBorderPainted(false);     
@@ -103,7 +103,10 @@ public class LoginPage extends JPanel {
             Account account = authService.authenticate(email, password);
             if (account != null) {
                 JOptionPane.showMessageDialog(this, "Login successful!");
-                // navigationListener.navigateTo("dashboard");
+                if (navigationListener != null) {
+                    // Navigate to HomePage, passing the adminId
+                    navigationListener.navigateTo(new HomePage(account.getAdminId(), navigationListener));
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid credentials.");
             }
