@@ -1,6 +1,6 @@
 
 import Frontend.RevenuePage;
-
+import Frontend.Passenger; 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -13,7 +13,7 @@ public class App {
                 JFrame frame = new JFrame("Revenue Page");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(850, 600);
-            frame.add(new RevenuePage());
+            frame.add(new Passenger());
             frame.setVisible(true);
             });
         } catch (Exception e) {
