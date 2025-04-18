@@ -33,11 +33,13 @@ public class App {
                         case "revenue":
                             frame.add(new RevenuePage());
                             break;
+                        case "passenger":
+                            frame.add(new PassengerPage());
                     }
                     frame.revalidate();
                     frame.repaint();
                 };
-                frame.add(new LoginPage(listener[0]));
+                frame.add(new EmployeePage());
                 frame.setVisible(true);
             });
         } catch (Exception e) {
