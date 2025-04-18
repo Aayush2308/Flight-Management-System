@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DBConnection {
     private static final String url = "jdbc:mysql://localhost:3306/project";
     private static final String username = "root";
-    private static final String password = "Carnage@2065";  //Carnage@2065 -- need to change this before pushing to git
+    private static final String password = "";  //Carnage@2065 -- need to change this before pushing to git
 
     private static Connection connection = null;
 
