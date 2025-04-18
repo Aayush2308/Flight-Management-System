@@ -1,5 +1,5 @@
 import Frontend.*;
-import Service.NavigationListener;
+import Interfaces.NavigationListener;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
