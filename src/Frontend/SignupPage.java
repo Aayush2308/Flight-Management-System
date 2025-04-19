@@ -1,19 +1,31 @@
 package Frontend;
 
 import Service.UserService;
-import Components.NavigationBar; // Assuming this component exists
-import Utilities.PlaceholderUtils; // Assuming this utility class exists
+import Components.NavigationBar;
+// Removed import Utilities.PlaceholderUtils; // No longer using PlaceholderUtils
 import javax.swing.*;
-import Interfaces.NavigationListener; // Assuming this interface exists
+import Interfaces.NavigationListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import javax.swing.event.DocumentListener;
 
 public class SignupPage extends JPanel {
     private JTextField nameField, contactField, emailField;
-    private JPasswordField passwordField;
+    private JTextField passwordField; // Changed from JPasswordField to JTextField
     private NavigationListener navigationListener;
-    private UserService userService; // Assuming this service exists
-    private NavigationBar navBar; // Assuming this component exists
+    private UserService userService;
+    private NavigationBar navBar;
+
+    // Placeholder text definitions and colors
+    private static final String NAME_PLACEHOLDER = "Name";
+    private static final String CONTACT_PLACEHOLDER = "Contact Number";
+    private static final String EMAIL_PLACEHOLDER = "Email";
+    private static final String PASSWORD_PLACEHOLDER = "Password"; // Placeholder text remains
+    private Color placeholderColor = Color.GRAY.brighter();
+    private Color textColor = Color.WHITE;
+
 
     public SignupPage(NavigationListener listener) {
         this.navigationListener = listener;
@@ -22,148 +34,140 @@ public class SignupPage extends JPanel {
     }
 
     private void initializeUI() {
-        // Use BorderLayout for the main panel
         setLayout(new BorderLayout());
+        setBackground(new Color(45, 45, 48));
 
-        // Apply a dark background to the main panel areas not covered by sub-panels
-        setBackground(new Color(45, 45, 48)); // Dark grey background
-
-        // Add Navigation Bar to the top (North)
         navBar = new NavigationBar("Sign Up", this::handleNavActions, 70);
-        // Apply dark theme to nav bar
-        navBar.setBackground(Color.DARK_GRAY); // Dark background for the nav bar
-        // Note: Styling the text/title inside NavigationBar depends on its implementation.
-        // You might need to modify NavigationBar itself to change title color if this line isn't enough.
-        // Example (assuming NavigationBar allows setting foreground):
-        // navBar.setForeground(Color.WHITE); // Set text color if applicable
-
+        navBar.setBackground(Color.DARK_GRAY);
         add(navBar, BorderLayout.NORTH);
 
-        // Content Panel for form fields with BoxLayout
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 50, 50));
-        // Apply a dark theme background to the content panel
-        contentPanel.setBackground(new Color(60, 63, 65)); // Lighter dark grey
+        contentPanel.setBackground(new Color(60, 63, 65));
 
-        // Name Field
-        nameField = createTextField("Name"); // Uses updated createTextField
-        contentPanel.add(nameField);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        // Name Field - condensed setup using helper
+        nameField = createTextField(NAME_PLACEHOLDER);
+        contentPanel.add(nameField); contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Contact Field
-        contactField = createTextField("Contact Number"); // Uses updated createTextField
-        contentPanel.add(contactField);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        // Contact Field - condensed setup using helper
+        contactField = createTextField(CONTACT_PLACEHOLDER);
+        contentPanel.add(contactField); contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Email Field
-        emailField = createTextField("Email"); // Uses updated createTextField
-        contentPanel.add(emailField);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        // Email Field - condensed setup using helper
+        emailField = createTextField(EMAIL_PLACEHOLDER);
+        contentPanel.add(emailField); contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Password Field
-        passwordField = new JPasswordField("Password");
-        passwordField.setEchoChar((char) 0); // Show initial placeholder text
+        // Password Field - now a JTextField
+        passwordField = new JTextField(); // Instantiated as JTextField
         passwordField.setMaximumSize(new Dimension(300, 40));
-        // Apply dark theme colors
-        passwordField.setBackground(new Color(50, 50, 50)); // Dark background
-        passwordField.setForeground(Color.WHITE); // Light text color
-        passwordField.setCaretColor(Color.WHITE); // White cursor
-        PlaceholderUtils.addPlaceholderStyle(passwordField); // Apply placeholder style
-        contentPanel.add(passwordField);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        passwordField.setBackground(new Color(50, 50, 50));
+        passwordField.setCaretColor(Color.WHITE);
+        addManualPlaceholder(passwordField, PASSWORD_PLACEHOLDER); // Use manual placeholder logic
 
-        // Add placeholder listeners (assuming PlaceholderUtils handles colors correctly)
-        PlaceholderUtils.addPlaceholderListeners(nameField, "Name");
-        PlaceholderUtils.addPlaceholderListeners(contactField, "Contact Number");
-        PlaceholderUtils.addPlaceholderListeners(emailField, "Email");
-        PlaceholderUtils.addPlaceholderListeners(passwordField, "Password");
+        contentPanel.add(passwordField); contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Register Button
+
+        // Register Button - condensed setup
         JButton registerButton = new JButton("Register");
-        // Apply dark theme button styling
-        registerButton.setBackground(new Color(0, 120, 215)); // Blue accent
-        registerButton.setForeground(Color.WHITE); // White text
-        registerButton.setFocusPainted(false); // Remove focus border
-        registerButton.setBorderPainted(false); // Remove default border
-        registerButton.setOpaque(true); // Make sure background is painted
-        registerButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center button horizontally
-        registerButton.addActionListener(e -> registerUser());
+        registerButton.setBackground(new Color(0, 120, 215)); registerButton.setForeground(Color.WHITE); registerButton.setFocusPainted(false); registerButton.setBorderPainted(false); registerButton.setOpaque(true);
+        registerButton.setAlignmentX(Component.CENTER_ALIGNMENT); registerButton.addActionListener(e -> registerUser());
         contentPanel.add(registerButton);
 
-        // Add content panel to CENTER
         add(contentPanel, BorderLayout.CENTER);
     }
 
     private void handleNavActions(ActionEvent e) {
         String command = ((JButton) e.getSource()).getText();
-        // Assuming the navBar button text is "←"
-        if ("←".equals(command)) {
-            if (navigationListener != null) {
-                navigationListener.navigateTo("login"); // Navigate back to login page
-            }
+        if ("←".equals(command) && navigationListener != null) {
+             navigationListener.navigateTo("login");
         }
-         // If NavigationBar has a title label and you want to style it:
-         // Example: if (navBar.getTitleLabel() != null) navBar.getTitleLabel().setForeground(Color.WHITE);
     }
 
-    // Updated createTextField to include dark theme colors
-    private JTextField createTextField(String placeholder) {
-        JTextField field = new JTextField(placeholder);
+    // createTextField helper remains the same, it works for JTextField
+    private JTextField createTextField(String placeholderText) {
+        JTextField field = new JTextField();
         field.setMaximumSize(new Dimension(300, 40));
-        // Apply dark theme colors
-        field.setBackground(new Color(50, 50, 50)); // Dark background
-        field.setForeground(Color.WHITE); // Light text color
-        field.setCaretColor(Color.WHITE); // White cursor for visibility
-        // PlaceholderUtils will handle setting the placeholder text color when empty/not focused.
-        // Ensure PlaceholderUtils is configured to use a light color (like light grey) for placeholders on dark fields.
-        PlaceholderUtils.addPlaceholderStyle(field);
+        field.setBackground(new Color(50, 50, 50));
+        field.setCaretColor(Color.WHITE);
+
+        addManualPlaceholder(field, placeholderText); // Use manual placeholder
+
         return field;
     }
+
+     // Manual placeholder logic - adapted for JTextField (removed JPasswordField specific parts)
+    private void addManualPlaceholder(JTextField field, String placeholderText) {
+        Color currentPlaceholderColor = placeholderColor;
+        Color currentTextColor = textColor;
+
+        field.setText(placeholderText);
+        field.setForeground(currentPlaceholderColor);
+        // Removed JPasswordField specific echo char handling
+
+
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholderText) && field.getForeground().equals(currentPlaceholderColor)) {
+                    field.setText("");
+                    field.setForeground(currentTextColor);
+                    // Removed JPasswordField specific echo char handling
+                }
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().isEmpty()) {
+                    field.setText(placeholderText);
+                    field.setForeground(currentPlaceholderColor);
+                    // Removed JPasswordField specific echo char handling
+                }
+            }
+        });
+
+         field.getDocument().addDocumentListener(new DocumentListener() {
+             public void changedUpdate(javax.swing.event.DocumentEvent e) { updateColor(); }
+             public void removeUpdate(javax.swing.event.DocumentEvent e) { updateColor(); }
+             public void insertUpdate(javax.swing.event.DocumentEvent e) { updateColor(); }
+             private void updateColor() {
+                 if (!field.getText().equals(placeholderText) && field.getForeground().equals(currentPlaceholderColor)) {
+                     field.setForeground(currentTextColor);
+                 }
+                 // Removed JPasswordField specific echo char handling
+             }
+         });
+    }
+
 
     private void registerUser() {
         String name = nameField.getText().trim();
         String contact = contactField.getText().trim();
         String email = emailField.getText().trim();
-        String password = String.valueOf(passwordField.getPassword()).trim();
+        String password = passwordField.getText().trim(); // Get text directly from JTextField
 
-        if (hasEmptyFields(name, contact, email, password)) {
-            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+        // Check if fields still contain placeholder text or are empty
+        if (name.equals(NAME_PLACEHOLDER) || contact.equals(CONTACT_PLACEHOLDER) || email.equals(EMAIL_PLACEHOLDER) || password.equals(PASSWORD_PLACEHOLDER) || name.isEmpty() || contact.isEmpty() || email.isEmpty() || password.isEmpty()) {
+             JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.WARNING_MESSAGE);
+             return;
+         }
+
 
         try {
-            // Assuming registerUser returns boolean indicating success
+            // Pass the visible password string to the service
             if (userService.registerUser(name, contact, email, password)) {
                 JOptionPane.showMessageDialog(this, "Signup Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 if (navigationListener != null) {
-                    navigationListener.navigateTo("login"); // Navigate to login after successful signup
+                    navigationListener.navigateTo("login");
                 }
             } else {
-                 // Handle registration failure (e.g., email already exists) if userService.registerUser returns false
                  JOptionPane.showMessageDialog(this, "Registration failed. Please try again.", "Signup Failed", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            // Log the exception in a real application
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Helper method to check for empty or placeholder fields
-    private boolean hasEmptyFields(String... fields) {
-        for (String field : fields) {
-            // Check if the field is empty after trimming or still contains placeholder text
-            if (field.isEmpty() ||
-                (emailField.getText().trim().equals("Email") && field.equals(emailField.getText().trim())) ||
-                (nameField.getText().trim().equals("Name") && field.equals(nameField.getText().trim())) ||
-                (contactField.getText().trim().equals("Contact Number") && field.equals(contactField.getText().trim())) ||
-                (String.valueOf(passwordField.getPassword()).trim().equals("Password") && field.equals(String.valueOf(passwordField.getPassword()).trim())) // Handle password field placeholder
-               )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    // The old hasEmptyFields method was removed in the previous step.
+    // The necessary checks are done directly in registerUser.
 }
