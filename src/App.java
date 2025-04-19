@@ -1,8 +1,7 @@
 import Frontend.*;
 import Interfaces.NavigationListener;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class App {
     public static void main(String[] args) {
@@ -64,7 +63,7 @@ public class App {
                 };
 
                 // Initial screen
-                contentPane.add(new LoginPage(listener[0]));
+                contentPane.add(new EmployeePage(1,listener[0]));
 
                 frame.setVisible(true);
             });
