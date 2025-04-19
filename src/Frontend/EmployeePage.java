@@ -5,6 +5,9 @@ import Interfaces.NavigationListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import Components.NavigationBar;
+
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ItemEvent;
@@ -15,11 +18,9 @@ public class EmployeePage extends JPanel {
     private JComboBox<String> sortComboBox;
     private JButton sortAscButton, sortDescButton;
     private JButton addButton, updateButton, deleteButton, searchButton;
-    private JPanel topPanel, bottomPanel, headerPanel, controlsPanel;
+    private JPanel bottomPanel, controlsPanel;
     private JTextField searchField;
     private Integer currentSearchId = null;
-    private JButton backButton;
-    private JLabel titleLabel;
 
     // --- Define a dark color palette ---
     private static final Color DARK_BACKGROUND = new Color(45, 45, 48);
@@ -37,34 +38,8 @@ public class EmployeePage extends JPanel {
         setBackground(DARK_BACKGROUND);
         setForeground(LIGHT_TEXT);
 
-        // --- Top panel: Header (Back, Title, Search) ---
-        headerPanel = new JPanel(new BorderLayout(10, 0));
-        headerPanel.setBackground(MEDIUM_BACKGROUND);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel leftHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        leftHeaderPanel.setOpaque(false);
-        backButton = new JButton("Back");
-        styleHeaderButton(backButton);
-        leftHeaderPanel.add(backButton);
-        titleLabel = new JLabel("Employee List");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        titleLabel.setForeground(LIGHT_TEXT);
-        leftHeaderPanel.add(titleLabel);
-        headerPanel.add(leftHeaderPanel, BorderLayout.WEST);
-
-        JPanel rightHeaderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        rightHeaderPanel.setOpaque(false);
-        JLabel searchLabel = new JLabel("Search by ID:");
-        searchLabel.setForeground(LIGHT_TEXT);
-        searchField = new JTextField(10);
-        styleTextField(searchField);
-        searchButton = new JButton("Search");
-        styleHeaderButton(searchButton);
-        rightHeaderPanel.add(searchLabel);
-        rightHeaderPanel.add(searchField);
-        rightHeaderPanel.add(searchButton);
-        headerPanel.add(rightHeaderPanel, BorderLayout.EAST);
+        NavigationBar navBar = new NavigationBar("Profile", e -> navigationListener.navigateTo(new HomePage(adminId, navigationListener)), 70);
+        add(navBar, BorderLayout.NORTH);
 
         // --- Controls panel: Sort and CRUD buttons ---
         controlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
@@ -79,11 +54,20 @@ public class EmployeePage extends JPanel {
         styleControlPanelButton(sortAscButton);
         sortDescButton = new JButton("Sort ↓");
         styleControlPanelButton(sortDescButton);
+
+        JLabel searchLabel = new JLabel("Search by ID:");
+        searchLabel.setForeground(LIGHT_TEXT);
+        searchField = new JTextField(10);
+        styleTextField(searchField);
+        searchButton = new JButton("Search");
+        styleHeaderButton(searchButton);
+
         controlsPanel.add(sortByLabel);
         controlsPanel.add(sortComboBox);
         controlsPanel.add(sortAscButton);
         controlsPanel.add(sortDescButton);
 
+        
         controlsPanel.add(new JSeparator(SwingConstants.VERTICAL));
         addButton = new JButton("Add");
         styleControlPanelButton(addButton);
@@ -94,12 +78,15 @@ public class EmployeePage extends JPanel {
         controlsPanel.add(addButton);
         controlsPanel.add(updateButton);
         controlsPanel.add(deleteButton);
+        
+        controlsPanel.add(searchLabel);
+        controlsPanel.add(searchField);
+        controlsPanel.add(searchButton);
 
-        topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.add(headerPanel);
-        topPanel.add(controlsPanel);
-        add(topPanel, BorderLayout.NORTH);
+        JPanel northContainer = new JPanel(new BorderLayout());
+        northContainer.add(navBar, BorderLayout.NORTH);
+        northContainer.add(controlsPanel, BorderLayout.SOUTH);
+        add(northContainer, BorderLayout.NORTH);
 
         // --- Center: Employee table ---
         employeeTable = new JTable();
@@ -117,10 +104,6 @@ public class EmployeePage extends JPanel {
         // --- Initial load ---
         fetchAndDisplayEmployees("employeeId", true);
 
-        // --- Listeners ---
-        backButton.addActionListener(e -> {
-            if (navigationListener != null) navigationListener.navigateTo(new HomePage(adminId, navigationListener));
-        });
         sortAscButton.addActionListener(e -> fetchAndDisplayEmployees((String) sortComboBox.getSelectedItem(), true));
         sortDescButton.addActionListener(e -> fetchAndDisplayEmployees((String) sortComboBox.getSelectedItem(), false));
         addButton.addActionListener(e -> showAddDialog());

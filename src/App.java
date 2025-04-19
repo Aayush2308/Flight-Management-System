@@ -44,8 +44,14 @@ public class App {
                             // case "flight":
                             //     contentPane.add(new FlightPage());
                             //     break;
+                            case "profile":
+                                contentPane.add(new ProfilePage(0, this));
+                                break;
                             case "home":
                                 contentPane.add(new HomePage(0, this)); // default homepage
+                                break;
+                            case "update":
+                                contentPane.add(new UpdateProfilePage(0, this));
                                 break;
                             default:
                                 contentPane.add(new JLabel("Page not found: " + pageName));
@@ -64,7 +70,7 @@ public class App {
                 };
 
                 // Initial screen
-                contentPane.add(new LoginPage(listener[0]));
+                contentPane.add(new PassengerPage(1,listener[0]));
 
                 frame.setVisible(true);
             });

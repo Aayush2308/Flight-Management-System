@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
 
+import Components.NavigationBar;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
@@ -15,9 +17,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
 public class PassengerPage extends JPanel {
-    private int adminId;
-    private NavigationListener navigationListener;
-
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JTable table;
@@ -32,31 +31,15 @@ public class PassengerPage extends JPanel {
     private final Color darkBg = new Color(30, 32, 34);
     private final Color darkPanel = new Color(40, 42, 45);
     private final Color primary = new Color(0, 150, 136);  // Teal
-    private final Color accent = new Color(255, 171, 64); // Orange
     private final Font font = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font titleFont = new Font("Segoe UI Semibold", Font.BOLD, 24);
 
     public PassengerPage(int adminId, NavigationListener navigationListener) {
-        this.adminId = adminId;
-        this.navigationListener = navigationListener;
-
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(1100, 650));
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(darkBg);
-        topPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
-        
-        JButton backButton = createBackButton();
-        topPanel.add(backButton, BorderLayout.WEST);
-        
-        JLabel title = new JLabel("Passenger Management");
-        title.setFont(titleFont);
-        title.setForeground(Color.WHITE);
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        topPanel.add(title, BorderLayout.CENTER);
-
-        add(topPanel, BorderLayout.NORTH);
+        NavigationBar navBar = new NavigationBar("Profile", e -> navigationListener.navigateTo(new HomePage(adminId, navigationListener)), 70);
+        add(navBar, BorderLayout.NORTH);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
@@ -71,36 +54,6 @@ public class PassengerPage extends JPanel {
 
         loadPassengers();
         cardLayout.show(mainPanel, "ListView");
-    }
-
-    private JButton createBackButton() {
-        JButton backButton = new JButton("← Back");
-        backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        backButton.setBackground(new Color(60, 63, 65));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFocusPainted(false);
-        backButton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(80, 80, 80)),
-            BorderFactory.createEmptyBorder(5, 15, 5, 15)
-        ));
-        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
-        backButton.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                backButton.setBackground(new Color(80, 83, 85));
-            }
-            public void mouseExited(MouseEvent e) {
-                backButton.setBackground(new Color(60, 63, 65));
-            }
-        });
-        
-        backButton.addActionListener(e -> {
-            if (navigationListener != null) {
-                navigationListener.navigateTo(new HomePage(adminId, navigationListener));
-            }
-        });
-        
-        return backButton;
     }
 
     private void initListPanel() {

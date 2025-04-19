@@ -6,11 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class StyledButton extends JButton {
-    private Color color;
-    
     public StyledButton(String text, Color color) {
         super(text);
-        this.color = color;
         setPreferredSize(new Dimension(100, 35));
         setBorderPainted(false);
         setContentAreaFilled(false);

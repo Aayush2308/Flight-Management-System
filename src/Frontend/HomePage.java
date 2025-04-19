@@ -13,9 +13,10 @@ public class HomePage extends JPanel {
 
     private static final Color COLOR_BACKGROUND = new Color(45, 45, 45); // Dark gray background
     private static final Color COLOR_NAVBAR = new Color(30, 30, 30);      // Slightly darker navbar
-    private static final Color COLOR_CARD = new Color(60, 60, 60);        // Card background
+    private static final Color COLOR_CARD = Color.WHITE;        // Card background
     private static final Color COLOR_CARD_HOVER = new Color(75, 75, 75);  // Card background on hover
     private static final Color COLOR_TEXT = new Color(220, 220, 220);      // Light gray text
+    private static final Color CARD_TEXT = Color.BLACK;
     private static final Color COLOR_BORDER = new Color(80, 80, 80);      // Border color
     private static final Font FONT_TITLE = new Font("SansSerif", Font.BOLD, 20);
     private static final Font FONT_CARD_TITLE = new Font("SansSerif", Font.BOLD, 16);
@@ -34,9 +35,6 @@ public class HomePage extends JPanel {
     private int adminId;
     private NavigationListener navigationListener;
 
-    /**
-     * Constructor for the HomePage. Sets up the JPanel and initializes components.
-     */
     public HomePage(int adminId, NavigationListener navigationListener) {
         this.adminId = adminId;
         this.navigationListener = navigationListener;
@@ -69,18 +67,12 @@ public class HomePage extends JPanel {
         cardLayout.show(mainContentPanel, HOME_PANEL);
     }
 
-    /**
-     * Creates the top navigation bar panel.
-     * @return JPanel representing the navigation bar.
-     */
     private JPanel createNavBar() {
         JPanel navBar = new JPanel(new BorderLayout()); // Use BorderLayout for icon/title positioning
         navBar.setBackground(COLOR_NAVBAR);
         navBar.setPreferredSize(new Dimension(getWidth(), 50)); // Set preferred height
         navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER)); // Bottom border
 
-        // --- Home Icon (Placeholder) ---
-        // Using a clickable JLabel as a simple button
         JLabel homeIcon = new JLabel(" \u2302 "); // Unicode House symbol (simple placeholder)
         homeIcon.setFont(FONT_NAV_ICONS);
         homeIcon.setForeground(COLOR_TEXT);
@@ -110,8 +102,6 @@ public class HomePage extends JPanel {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center the title
         navBar.add(titleLabel, BorderLayout.CENTER);
 
-        // --- Profile Icon (Placeholder) ---
-        // Using a clickable JLabel as a simple button
         JLabel profileIcon = new JLabel(" \uD83D\uDC64 "); // Unicode Bust in Silhouette (simple placeholder)
         profileIcon.setFont(FONT_NAV_ICONS);
         profileIcon.setForeground(COLOR_TEXT);
@@ -121,10 +111,9 @@ public class HomePage extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Placeholder action for profile click
-                JOptionPane.showMessageDialog(HomePage.this,
-                        "Profile Icon Clicked!",
-                        "Profile Action",
-                        JOptionPane.INFORMATION_MESSAGE);
+               if(navigationListener != null){
+                navigationListener.navigateTo(new ProfilePage(adminId, navigationListener));
+               }
             }
              @Override
             public void mouseEntered(MouseEvent e) {
@@ -140,10 +129,6 @@ public class HomePage extends JPanel {
         return navBar;
     }
 
-     /**
-     * Creates the main home panel containing the four navigation cards.
-     * @return JPanel representing the home screen with cards.
-     */
     private JPanel createHomePanel() {
         JPanel homePanel = new JPanel(new GridLayout(2, 2, 20, 20)); // 2x2 grid with gaps
         homePanel.setBackground(COLOR_BACKGROUND); // Match main background
@@ -166,7 +151,7 @@ public class HomePage extends JPanel {
 
         JLabel cardLabel = new JLabel(title);
         cardLabel.setFont(FONT_CARD_TITLE);
-        cardLabel.setForeground(COLOR_TEXT);
+        cardLabel.setForeground(CARD_TEXT);
         cardLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center text horizontally
         cardLabel.setVerticalAlignment(SwingConstants.CENTER);     // Center text vertically
         card.add(cardLabel, BorderLayout.CENTER);

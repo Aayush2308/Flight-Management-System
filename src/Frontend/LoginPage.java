@@ -31,10 +31,10 @@ public class LoginPage extends JPanel {
 
     private void initializeUI() {
         setLayout(new BorderLayout());
-        setBackground(new Color(45, 45, 48));
+        setBackground(Color.WHITE);
 
         navBar = new LoginNavigationBar("Login", this::handleNavActions, 70);
-        navBar.setBackground(Color.DARK_GRAY);
+        navBar.setBackground(Color.BLACK);
         add(navBar, BorderLayout.NORTH);
 
         JPanel contentPanel = new JPanel();

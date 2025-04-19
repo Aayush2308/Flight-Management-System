@@ -4,8 +4,6 @@ import Models.Revenue;
 import Service.RevenueService;
 import Components.NavigationBar;
 import Components.ShadowBorder;
-import Components.StyledButton;
-import DBConnection.DBConnection;
 import Interfaces.NavigationListener;
 
 import java.awt.*;
@@ -34,10 +32,8 @@ public class RevenuePage extends JPanel {
 
     // Design constants
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
     private static final Color ACCENT_COLOR = new Color(231, 76, 60);
     private static final Color BACKGROUND_COLOR = new Color(236, 240, 241);
-    private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 32);
     private static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 18);
     private static final Font REGULAR_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
