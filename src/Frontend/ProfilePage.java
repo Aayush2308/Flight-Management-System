@@ -3,6 +3,9 @@ package Frontend;
 import Components.NavigationBar;
 import DBConnection.DBConnection;
 import Interfaces.NavigationListener;
+import Models.Admin;
+import Service.AdminService;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
@@ -152,28 +155,23 @@ public class ProfilePage extends JPanel {
         }
     }
 
-    private void fetchAdminDetails(int adminId) {
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement pst = con.prepareStatement("SELECT * FROM admin WHERE adminId = ?")) {
-            
-            pst.setInt(1, adminId);
-            ResultSet rs = pst.executeQuery();
+        private void fetchAdminDetails(int adminId) {
+        AdminService service = new AdminService();
+        Admin admin = service.getAdminById(adminId);
 
-            if (rs.next()) {
-                nameLabel.setText(rs.getString("name"));
-                emailLabel.setText(rs.getString("email"));
-                contactLabel.setText(rs.getString("contactNumber"));
-                
-                // Handle password display
-                String password = rs.getString("password");
-                if (password != null) {
-                    passwordLabel.setText(passwordVisible ? password : "••••••••");
-                } else {
-                    passwordLabel.setText("Not set");
-                }
+        if (admin != null) {
+            nameLabel.setText(admin.getName());
+            emailLabel.setText(admin.getEmail());
+            contactLabel.setText(admin.getContactNumber());
+
+            String password = admin.getPassword();
+            if (password != null) {
+                passwordLabel.setText(passwordVisible ? password : "••••••••");
+            } else {
+                passwordLabel.setText("Not set");
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error loading profile: " + e.getMessage());
+        } else {
+            JOptionPane.showMessageDialog(this, "Error loading profile.");
         }
     }
 }

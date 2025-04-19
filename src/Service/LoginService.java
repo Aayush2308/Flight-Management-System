@@ -5,7 +5,7 @@ import DBConnection.DBConnection;
 import Models.Account;
 import java.sql.*;
 
-public class AuthService {
+public class LoginService {
     public Account authenticate(String email, String password) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             String query = "SELECT * FROM account WHERE email = ? AND password = ?";
