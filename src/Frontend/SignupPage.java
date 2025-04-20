@@ -167,7 +167,4 @@ public class SignupPage extends JPanel {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // The old hasEmptyFields method was removed in the previous step.
-    // The necessary checks are done directly in registerUser.
 }

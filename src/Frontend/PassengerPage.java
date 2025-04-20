@@ -1,46 +1,50 @@
+// Frontend/PassengerPage.java
 package Frontend;
 
-import DBConnection.DBConnection;
-import Exception.InvalidPhoneNumberException;
-import Interfaces.NavigationListener;
-import Utilities.InputValidator;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.*;
-
 import Components.NavigationBar;
-
+import DBConnection.DBConnection;
+import Models.Passenger;
+import Service.PassengerService;
+import Interfaces.NavigationListener;
+import Exception.InvalidPhoneNumberException;
+import Utilities.InputValidator;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Vector;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
+import java.util.List;
+import javax.swing.event.*;
 
 public class PassengerPage extends JPanel {
+    private PassengerService passengerService;
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JTable table;
     private DefaultTableModel tableModel;
     private TableRowSorter<DefaultTableModel> sorter;
     private JTextField searchField;
-
     private JPanel listPanel, detailsPanel;
     private JLabel detailName, detailTicket, detailPassport, detailContact, detailLuggage;
 
-    // Updated color scheme
     private final Color darkBg = new Color(30, 32, 34);
     private final Color darkPanel = new Color(40, 42, 45);
-    private final Color primary = new Color(0, 150, 136);  // Teal
+    private final Color primary = new Color(0, 150, 136);
     private final Font font = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font titleFont = new Font("Segoe UI Semibold", Font.BOLD, 24);
 
     public PassengerPage(int adminId, NavigationListener navigationListener) {
+        this.passengerService = new PassengerService();
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(1100, 650));
 
-        NavigationBar navBar = new NavigationBar("Passenger", e -> navigationListener.navigateTo(new HomePage(adminId, navigationListener)), 70);
+        NavigationBar navBar = new NavigationBar("Passenger", e -> 
+            navigationListener.navigateTo(new HomePage(adminId, navigationListener)), 70);
         add(navBar, BorderLayout.NORTH);
 
         cardLayout = new CardLayout();
@@ -153,8 +157,8 @@ public class PassengerPage extends JPanel {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 15));
         btnPanel.setBackground(darkBg);
         
-        JButton addBtn = createButton("➕ Add Passenger", new Color(0, 150, 136));  // Teal
-        JButton deleteBtn = createButton("🗑 Delete Passenger", new Color(239, 83, 80));  // Red
+        JButton addBtn = createButton("➕ Add Passenger", new Color(0, 150, 136));
+        JButton deleteBtn = createButton("🗑 Delete Passenger", new Color(239, 83, 80));
         btnPanel.add(addBtn);
         btnPanel.add(deleteBtn);
         listPanel.add(btnPanel, BorderLayout.SOUTH);
@@ -209,12 +213,8 @@ public class PassengerPage extends JPanel {
                     return;
                 }
         
-                try (Connection con = DBConnection.getConnection();
-                     CallableStatement cs = con.prepareCall("{CALL InsertNewPassenger(?, ?, ?)}")) {
-                    cs.setString(1, passport);
-                    cs.setString(2, name);
-                    cs.setString(3, contact);
-                    cs.execute();
+                try {
+                    passengerService.addPassenger(passport, name, contact);
                     JOptionPane.showMessageDialog(PassengerPage.this, "Passenger added successfully.");
                     refreshPassengerList();
                 } catch (SQLException ex) {
@@ -223,23 +223,15 @@ public class PassengerPage extends JPanel {
                 }
             }
         });
-        
 
-        // Delete Passenger
         deleteBtn.addActionListener(e -> {
             String ticket = JOptionPane.showInputDialog(PassengerPage.this, "Enter Ticket Number to Delete:");
             if (ticket == null || ticket.isEmpty()) return;
 
-            try (Connection con = DBConnection.getConnection();
-                 PreparedStatement ps = con.prepareStatement("DELETE FROM Passenger WHERE ticketNumber = ?")) {
-                ps.setString(1, ticket);
-                int rows = ps.executeUpdate();
-                if (rows > 0) {
-                    JOptionPane.showMessageDialog(PassengerPage.this, "Passenger deleted.");
-                    refreshPassengerList();
-                } else {
-                    JOptionPane.showMessageDialog(PassengerPage.this, "No passenger found.");
-                }
+            try {
+                passengerService.deletePassenger(ticket);
+                JOptionPane.showMessageDialog(PassengerPage.this, "Passenger deleted.");
+                refreshPassengerList();
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(PassengerPage.this, "Error deleting passenger.");
@@ -303,17 +295,16 @@ public class PassengerPage extends JPanel {
 
     private JButton createButton(String text, Color bgColor) {
         JButton btn = new JButton(text);
-        btn.setBackground(Color.WHITE);  // White background
-        btn.setForeground(Color.BLACK);  // Black text
+        btn.setBackground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.BLACK),  // Black border
+            BorderFactory.createLineBorder(Color.BLACK),
             BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         
-        // Hover effect - black background with white text
         btn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(Color.BLACK);
@@ -330,20 +321,17 @@ public class PassengerPage extends JPanel {
 
     private void loadPassengers() {
         tableModel.setRowCount(0);
-        try (Connection con = DBConnection.getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT name, ticketNumber, passportNumber, contactNumber FROM Passenger")) {
-
-            while (rs.next()) {
+        try {
+            List<Passenger> passengers = passengerService.getAllPassengers();
+            for (Passenger passenger : passengers) {
                 Vector<Object> row = new Vector<>();
-                row.add(rs.getString("name"));
-                row.add(rs.getString("ticketNumber"));
-                row.add(rs.getString("passportNumber"));
-                row.add(rs.getString("contactNumber"));
+                row.add(passenger.getName());
+                row.add(passenger.getTicketNumber());
+                row.add(passenger.getPassportNumber());
+                row.add(passenger.getContactNumber());
                 row.add("View Details");
                 tableModel.addRow(row);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(PassengerPage.this, "Error loading passengers.");
@@ -353,7 +341,6 @@ public class PassengerPage extends JPanel {
     private void refreshPassengerList() {
         loadPassengers();
     }
-
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
@@ -390,33 +377,29 @@ public class PassengerPage extends JPanel {
         }
 
         private void showDetails(String ticketNumber) {
-            try (Connection con = DBConnection.getConnection()) {
-                PreparedStatement ps = con.prepareStatement("SELECT * FROM Passenger WHERE ticketNumber = ?");
-                ps.setString(1, ticketNumber);
-                ResultSet rs = ps.executeQuery();
-
-                if (rs.next()) {
-                    detailName.setText("Name: " + rs.getString("name"));
-                    detailTicket.setText("Ticket #: " + rs.getString("ticketNumber"));
-                    detailPassport.setText("Passport #: " + rs.getString("passportNumber"));
-                    detailContact.setText("Contact #: " + rs.getString("contactNumber"));
+            try {
+                Passenger passenger = passengerService.getPassengerDetails(ticketNumber);
+                float luggageWeight = passengerService.getLuggageWeight(ticketNumber);
+        
+                if (passenger != null) {
+                    detailName.setText("Name: " + passenger.getName());
+                    detailTicket.setText("Ticket #: " + passenger.getTicketNumber());
+                    detailPassport.setText("Passport #: " + passenger.getPassportNumber());
+                    detailContact.setText("Contact #: " + passenger.getContactNumber());
                 }
-
-                PreparedStatement ls = con.prepareStatement("SELECT weightOfItems FROM Luggage WHERE ticketNumber = ?");
-                ls.setString(1, ticketNumber);
-                ResultSet lr = ls.executeQuery();
-
-                if (lr.next()) {
-                    detailLuggage.setText("Luggage Weight: " + lr.getFloat("weightOfItems") + " kg");
+        
+                if (luggageWeight >= 0) {
+                    detailLuggage.setText("Luggage Weight: " + luggageWeight + " kg");
                 } else {
                     detailLuggage.setText("Luggage: Not Available");
                 }
-
+        
                 cardLayout.show(mainPanel, "DetailView");
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(PassengerPage.this, "Error retrieving passenger details.");
             }
         }
+        
     }
 }
