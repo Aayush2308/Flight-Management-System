@@ -168,7 +168,7 @@ public class HomePage extends JPanel {
                 } else if (panelName.equals(REVENUE_PANEL)) {
                     navigationListener.navigateTo(new RevenuePage(adminId, navigationListener));
                 } else if (panelName.equals(FLIGHT_PANEL)) {
-                    navigationListener.navigateTo("flight");
+                    navigationListener.navigateTo(new FlightDetails(adminId, navigationListener));
                 }
             }
         });
