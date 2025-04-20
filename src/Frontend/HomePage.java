@@ -1,198 +1,52 @@
 package Frontend;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
+import Components.HomeNavBar;
+import Components.HomeDashboardCard;
+import Components.HomePlaceholderPanel;
 import Interfaces.NavigationListener;
+import Utilities.HomeUIConstants;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class HomePage extends JPanel {
+    private static final String HOME_KEY      = "Home";
+    private static final String EMP_KEY       = "EmployeePage";
+    private static final String PASS_KEY      = "PassengerPage";
+    private static final String REV_KEY       = "RevenuePage";
+    private static final String FLIGHT_KEY    = "FlightPage";
 
-    private static final Color COLOR_BACKGROUND = new Color(45, 45, 45);
-    private static final Color COLOR_NAVBAR = new Color(30, 30, 30);
-    private static final Color COLOR_CARD = Color.WHITE;
-    private static final Color COLOR_CARD_HOVER = new Color(75, 75, 75);
-    private static final Color COLOR_TEXT = new Color(220, 220, 220);
-    private static final Color CARD_TEXT = Color.BLACK;
-    private static final Color COLOR_BORDER = new Color(80, 80, 80);
-    private static final Font FONT_TITLE = new Font("SansSerif", Font.BOLD, 20);
-    private static final Font FONT_CARD_TITLE = new Font("SansSerif", Font.BOLD, 16);
-    private static final Font FONT_NAV_ICONS = new Font("SansSerif", Font.BOLD, 18);
+    private final CardLayout cardLayout = new CardLayout();
+    private final JPanel mainContent     = new JPanel(cardLayout);
 
-    private static final String HOME_PANEL = "Home";
-    private static final String EMPLOYEE_PANEL = "EmployeePage";
-    private static final String PASSENGER_PANEL = "PassengerPage";
-    private static final String REVENUE_PANEL = "RevenuePage";
-    private static final String FLIGHT_PANEL = "FlightDetailsPage";
-
-    private JPanel mainContentPanel;
-    private CardLayout cardLayout;
-    private int adminId;
-    private NavigationListener navigationListener;
-
-    public HomePage(int adminId, NavigationListener navigationListener) {
-        this.adminId = adminId;
-        this.navigationListener = navigationListener;
+    public HomePage(int adminId, NavigationListener nav) {
         setLayout(new BorderLayout());
-        setBackground(COLOR_BACKGROUND);
+        setBackground(HomeUIConstants.BACKGROUND);
 
-        JPanel navBar = createNavBar();
-        add(navBar, BorderLayout.NORTH);
+        add(new HomeNavBar(adminId, nav), BorderLayout.NORTH);
 
-        cardLayout = new CardLayout();
-        mainContentPanel = new JPanel(cardLayout);
-        mainContentPanel.setBackground(COLOR_BACKGROUND);
-        mainContentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        mainContent.setBackground(HomeUIConstants.BACKGROUND);
+        mainContent.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        mainContent.add(createHomeGrid(adminId, nav), HOME_KEY);
+        mainContent.add(new HomePlaceholderPanel(EMP_KEY,   "Employee Details Page"),   EMP_KEY);
+        mainContent.add(new HomePlaceholderPanel(PASS_KEY,  "Passenger Details Page"),  PASS_KEY);
+        mainContent.add(new HomePlaceholderPanel(REV_KEY,   "Revenue Details Page"),    REV_KEY);
+        mainContent.add(new HomePlaceholderPanel(FLIGHT_KEY,"Flight Details Page"),     FLIGHT_KEY);
 
-        JPanel homePanel = createHomePanel();
-        mainContentPanel.add(homePanel, HOME_PANEL);
-
-        mainContentPanel.add(createPlaceholderPanel(EMPLOYEE_PANEL, "Employee Details Page"), EMPLOYEE_PANEL);
-        mainContentPanel.add(createPlaceholderPanel(PASSENGER_PANEL, "Passenger Details Page"), PASSENGER_PANEL);
-        mainContentPanel.add(createPlaceholderPanel(REVENUE_PANEL, "Revenue Details Page"), REVENUE_PANEL);
-        mainContentPanel.add(createPlaceholderPanel(FLIGHT_PANEL, "Flight Details Page"), FLIGHT_PANEL);
-
-        add(mainContentPanel, BorderLayout.CENTER);
-
-        cardLayout.show(mainContentPanel, HOME_PANEL);
+        add(mainContent, BorderLayout.CENTER);
+        cardLayout.show(mainContent, HOME_KEY);
     }
 
-    private JPanel createNavBar() {
-        JPanel navBar = new JPanel(new BorderLayout());
-        navBar.setBackground(COLOR_NAVBAR);
-        navBar.setPreferredSize(new Dimension(getWidth(), 50));
-        navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER));
+    private JPanel createHomeGrid(int adminId, NavigationListener nav) {
+        JPanel grid = new JPanel(new GridLayout(2,2,20,20));
+        grid.setBackground(HomeUIConstants.BACKGROUND);
+        grid.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
 
-        // --- Logout Button ---
-        JLabel logoutButton = new JLabel("Logout");
-        logoutButton.setFont(FONT_NAV_ICONS);
-        logoutButton.setForeground(COLOR_TEXT);
-        logoutButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        logoutButton.setBorder(new EmptyBorder(0, 15, 0, 0));
-        logoutButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (navigationListener != null) {
-                    navigationListener.navigateTo(new LoginPage(navigationListener)); // Assuming "login" is the identifier for the login page
-                }
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                logoutButton.setForeground(Color.WHITE);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                logoutButton.setForeground(COLOR_TEXT);
-            }
-        });
-        navBar.add(logoutButton, BorderLayout.WEST);
+        grid.add(new HomeDashboardCard("Employee Details",   EMP_KEY,    adminId, nav));
+        grid.add(new HomeDashboardCard("Passenger Details",  PASS_KEY,   adminId, nav));
+        grid.add(new HomeDashboardCard("Revenue Details",    REV_KEY,    adminId, nav));
+        grid.add(new HomeDashboardCard("Flight Details",     FLIGHT_KEY, adminId, nav));
 
-        JLabel titleLabel = new JLabel("FMS");
-        titleLabel.setFont(FONT_TITLE);
-        titleLabel.setForeground(COLOR_TEXT);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        navBar.add(titleLabel, BorderLayout.CENTER);
-
-        JLabel profileIcon = new JLabel(" \uD83D\uDC64 ");
-        profileIcon.setFont(FONT_NAV_ICONS);
-        profileIcon.setForeground(COLOR_TEXT);
-        profileIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        profileIcon.setBorder(new EmptyBorder(0, 0, 0, 15));
-        profileIcon.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if(navigationListener != null){
-                    navigationListener.navigateTo(new ProfilePage(adminId, navigationListener));
-                }
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                profileIcon.setForeground(Color.WHITE);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                profileIcon.setForeground(COLOR_TEXT);
-            }
-        });
-        navBar.add(profileIcon, BorderLayout.EAST);
-
-        return navBar;
-    }
-
-    private JPanel createHomePanel() {
-        JPanel homePanel = new JPanel(new GridLayout(2, 2, 20, 20));
-        homePanel.setBackground(COLOR_BACKGROUND);
-        homePanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        homePanel.add(createCard("Employee Details", EMPLOYEE_PANEL));
-        homePanel.add(createCard("Passenger Details", PASSENGER_PANEL));
-        homePanel.add(createCard("Revenue Details", REVENUE_PANEL));
-        homePanel.add(createCard("Flight Details", FLIGHT_PANEL));
-
-        return homePanel;
-    }
-
-    private JPanel createCard(String title, String panelName) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(COLOR_CARD);
-        card.setBorder(new LineBorder(COLOR_BORDER, 1, true));
-        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        JLabel cardLabel = new JLabel(title);
-        cardLabel.setFont(FONT_CARD_TITLE);
-        cardLabel.setForeground(CARD_TEXT);
-        cardLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        cardLabel.setVerticalAlignment(SwingConstants.CENTER);
-        card.add(cardLabel, BorderLayout.CENTER);
-
-        card.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                card.setBackground(COLOR_CARD_HOVER);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                card.setBackground(COLOR_CARD);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (panelName.equals(PASSENGER_PANEL)) {
-                    navigationListener.navigateTo(new PassengerPage(adminId, navigationListener));
-                } else if (panelName.equals(EMPLOYEE_PANEL)) {
-                    navigationListener.navigateTo(new EmployeePage(adminId, navigationListener));
-                } else if (panelName.equals(REVENUE_PANEL)) {
-                    navigationListener.navigateTo(new RevenuePage(adminId, navigationListener));
-                } else if (panelName.equals(FLIGHT_PANEL)) {
-                    navigationListener.navigateTo(new FlightPage(adminId, navigationListener));         //
-                }
-            }
-        });
-
-        return card;
-    }
-
-    private JPanel createPlaceholderPanel(String name, String displayText) {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setName(name);
-        panel.setBackground(COLOR_BACKGROUND);
-
-        JLabel label = new JLabel(displayText);
-        label.setFont(FONT_TITLE);
-        label.setForeground(COLOR_TEXT);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        panel.add(label, gbc);
-        return panel;
+        return grid;
     }
 }
