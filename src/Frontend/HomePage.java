@@ -76,7 +76,7 @@ public class HomePage extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (navigationListener != null) {
-                    navigationListener.navigateTo("login"); // Assuming "login" is the identifier for the login page
+                    navigationListener.navigateTo(new LoginPage(navigationListener)); // Assuming "login" is the identifier for the login page
                 }
             }
             @Override
