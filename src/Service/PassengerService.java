@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 public class PassengerService {
     public List<Passenger> getAllPassengers() throws SQLException {
         List<Passenger> passengers = new ArrayList<>();
@@ -40,7 +42,10 @@ public class PassengerService {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement("DELETE FROM Passenger WHERE ticketNumber = ?")) {
             ps.setString(1, ticketNumber);
-            ps.executeUpdate();
+            int res = ps.executeUpdate();
+            if(res>0){
+                JOptionPane.showMessageDialog(null, "Passenger deleted successfully.");
+            }
         }
     }
     
