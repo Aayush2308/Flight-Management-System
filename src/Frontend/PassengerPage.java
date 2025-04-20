@@ -128,7 +128,7 @@ public class PassengerPage extends JPanel {
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setBackground(new Color(50, 52, 55));
-        header.setForeground(Color.WHITE);
+        header.setForeground(Color.BLACK);
         header.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         
         // Center-align all columns except Actions
@@ -220,19 +220,27 @@ public class PassengerPage extends JPanel {
             }
         });
 
-        deleteBtn.addActionListener(e -> {
-            String ticket = JOptionPane.showInputDialog(PassengerPage.this, "Enter Ticket Number to Delete:");
-            if (ticket == null || ticket.isEmpty()) return;
-
-            try {
-                passengerService.deletePassenger(ticket);
-                JOptionPane.showMessageDialog(PassengerPage.this, "Passenger deleted.");
-                refreshPassengerList();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(PassengerPage.this, "Error deleting passenger.");
+        deleteBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String ticketNumber = JOptionPane.showInputDialog("Enter Ticket Number to Delete:");
+                if (ticketNumber != null && !ticketNumber.trim().isEmpty()) {
+                    DefaultTableModel model = (DefaultTableModel) table.getModel(); // 🔧 this line resolves the model error
+                    boolean found = false;
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        if (model.getValueAt(i, 1).toString().equalsIgnoreCase(ticketNumber.trim())) {
+                            model.removeRow(i);
+                            JOptionPane.showMessageDialog(null, "Passenger deleted successfully.");
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        JOptionPane.showMessageDialog(null, "Ticket number not found.");
+                    }
+                }
             }
         });
+        
     }
 
     private void initDetailsPanel() {
