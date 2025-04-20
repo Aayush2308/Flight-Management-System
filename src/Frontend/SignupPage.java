@@ -20,7 +20,7 @@ import javax.swing.event.DocumentListener;
 
 public class SignupPage extends JPanel {
     private JTextField nameField, contactField, emailField;
-    private JTextField passwordField; // Changed from JPasswordField to JTextField
+    private JPasswordField passwordField; // Changed from JPasswordField to JTextField
     private NavigationListener navigationListener;
     private UserService userService;
     private NavigationBar navBar;
@@ -66,7 +66,7 @@ public class SignupPage extends JPanel {
         contentPanel.add(emailField); contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Password Field - now a JTextField
-        passwordField = new JTextField(); // Instantiated as JTextField
+        passwordField = new JPasswordField(); // Instantiated as JTextField
         passwordField.setMaximumSize(new Dimension(300, 40));
         passwordField.setBackground(new Color(50, 50, 50));
         passwordField.setCaretColor(Color.WHITE);
