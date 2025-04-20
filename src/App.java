@@ -66,7 +66,7 @@ public class App {
                 };
 
                 // Initial screen
-                contentPane.add(new LoginPage(listener[0]));
+                contentPane.add(new HomePage(1, listener[0]));
 
                 frame.setVisible(true);
             });
