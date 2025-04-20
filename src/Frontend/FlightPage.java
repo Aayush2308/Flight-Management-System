@@ -335,21 +335,13 @@ public class FlightPage extends JPanel {
                         psFlight.setString(3, iada);
                         psFlight.setString(4, source);
                         psFlight.setString(5, destination);
-                        psFlight.executeUpdate();
+                        int res = psFlight.executeUpdate();
+                        if(res>0){
+                            JOptionPane.showMessageDialog(FlightPage.this, "Flight added successfully!");
+                            loadFlights();
+                            dialog.dispose();
+                        }
                     }
-
-                    // Insert into flightSchedule table
-                    try (PreparedStatement psSchedule = con.prepareStatement(
-                            "INSERT INTO flightSchedule (flightId, departureTime, arrivalTime) VALUES (?, ?, ?)")) {
-                        psSchedule.setInt(1, flightId);
-                        psSchedule.setString(2, departure);
-                        psSchedule.setString(3, arrival);
-                        psSchedule.executeUpdate();
-                    }
-
-                    JOptionPane.showMessageDialog(FlightPage.this, "Flight added successfully!");
-                    loadFlights();
-                    dialog.dispose();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(FlightPage.this, 

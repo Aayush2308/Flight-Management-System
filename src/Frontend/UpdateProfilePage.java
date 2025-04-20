@@ -106,18 +106,18 @@ public class UpdateProfilePage extends JPanel {
             con.setAutoCommit(false);
 
             try (PreparedStatement adminStmt = con.prepareStatement(
-                    "UPDATE admin SET name=?, email=?, contactNumber=?, password=? WHERE adminId=?")) {
+                    "UPDATE admin SET name=?, email=?, contactNumber=? WHERE adminId=?")) {
                 adminStmt.setString(1, name);
                 adminStmt.setString(2, email);
                 adminStmt.setString(3, contact);
-                adminStmt.setInt(5, adminId);
+                adminStmt.setInt(4, adminId);
                 adminStmt.executeUpdate();
             }
 
             try (PreparedStatement accountStmt = con.prepareStatement(
-                    "UPDATE account SET email=?, password=? WHERE adminId=?")) {
+                    "UPDATE account SET email=? WHERE adminId=?")) {
                 accountStmt.setString(1, email);
-                accountStmt.setInt(3, adminId);
+                accountStmt.setInt(2, adminId);
                 accountStmt.executeUpdate();
             }
 
