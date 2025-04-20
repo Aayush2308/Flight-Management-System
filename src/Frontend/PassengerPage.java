@@ -2,7 +2,6 @@
 package Frontend;
 
 import Components.NavigationBar;
-import DBConnection.DBConnection;
 import Models.Passenger;
 import Service.PassengerService;
 import Interfaces.NavigationListener;
@@ -13,9 +12,6 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 import java.util.List;

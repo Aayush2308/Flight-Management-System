@@ -16,9 +16,7 @@ import Exception.*;
 public class UpdateProfilePage extends JPanel {
     private final int adminId;
     private final NavigationListener navigationListener;
-    private JTextField nameField, emailField, contactField, passwordField;
-    private JCheckBox showPasswordCheck;
-
+    private JTextField nameField, emailField, contactField;
     public UpdateProfilePage(int adminId, NavigationListener navigationListener) {
         this.adminId = adminId;
         this.navigationListener = navigationListener;
@@ -46,26 +44,6 @@ public class UpdateProfilePage extends JPanel {
         StyledComponents.addFormField(formPanel, gbc, 0, "Name:", nameField = StyledComponents.createTextField());
         StyledComponents.addFormField(formPanel, gbc, 1, "Email:", emailField = StyledComponents.createTextField());
         StyledComponents.addFormField(formPanel, gbc, 2, "Contact:", contactField = StyledComponents.createTextField());
-
-        // Password field
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        JLabel passwordLabel = StyledComponents.createLabel("Password:");
-        formPanel.add(passwordLabel, gbc);
-
-        gbc.gridx = 1;
-        passwordField = new JPasswordField(20);
-        passwordField.setFont(StyledComponents.FIELD_FONT);
-        formPanel.add(passwordField, gbc);
-
-        // Show password checkbox
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        showPasswordCheck = StyledComponents.createCheckBox("Show password", e -> {
-            JPasswordField pf = (JPasswordField) passwordField;
-            pf.setEchoChar(showPasswordCheck.isSelected() ? (char) 0 : '•');
-        });
-        formPanel.add(showPasswordCheck, gbc);
 
         // Buttons panel
         gbc.gridx = 0;
@@ -101,7 +79,6 @@ public class UpdateProfilePage extends JPanel {
                 nameField.setText(rs.getString("name"));
                 emailField.setText(rs.getString("email"));
                 contactField.setText(rs.getString("contactNumber"));
-                passwordField.setText(rs.getString("accountPassword"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error loading profile: " + e.getMessage());
@@ -112,18 +89,15 @@ public class UpdateProfilePage extends JPanel {
         String name = nameField.getText().trim();
         String email = emailField.getText().trim();
         String contact = contactField.getText().trim();
-        String password = new String(((JPasswordField) passwordField).getPassword());
 
-        if (name.isEmpty() || email.isEmpty() || contact.isEmpty() || password.isEmpty()) {
+        if (name.isEmpty() || email.isEmpty() || contact.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill all fields", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             InputValidator.validateEmail(email);
-            InputValidator.validatePassword(password);
-            InputValidator.validatePasswordStrength(password);
-        } catch (InvalidEmailException | InvalidPasswordException | WeakPasswordException ex) {
+        } catch (InvalidEmailException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -136,7 +110,6 @@ public class UpdateProfilePage extends JPanel {
                 adminStmt.setString(1, name);
                 adminStmt.setString(2, email);
                 adminStmt.setString(3, contact);
-                adminStmt.setString(4, password);
                 adminStmt.setInt(5, adminId);
                 adminStmt.executeUpdate();
             }
@@ -144,7 +117,6 @@ public class UpdateProfilePage extends JPanel {
             try (PreparedStatement accountStmt = con.prepareStatement(
                     "UPDATE account SET email=?, password=? WHERE adminId=?")) {
                 accountStmt.setString(1, email);
-                accountStmt.setString(2, password);
                 accountStmt.setInt(3, adminId);
                 accountStmt.executeUpdate();
             }

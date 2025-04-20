@@ -1,18 +1,21 @@
 package Frontend;
 
 import Components.NavigationBar;
+import Exception.InvalidPasswordException;
+import Exception.WeakPasswordException;
 import Interfaces.NavigationListener;
 import Models.Admin;
 import Service.AdminService;
+import Utilities.HashPassword;
+import Utilities.InputValidator;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ProfilePage extends JPanel {
-    private JLabel nameLabel, emailLabel, contactLabel, passwordLabel;
+    private JLabel nameLabel, emailLabel, contactLabel;
     private final int adminId;
     private final NavigationListener navigationListener;
-    private boolean passwordVisible = false;
     
     // Color scheme
     private static final Color BACKGROUND = Color.WHITE;
@@ -67,37 +70,19 @@ public class ProfilePage extends JPanel {
         // Contact field
         addFormField(profileCard, gbc, 2, "Contact:", contactLabel = new JLabel());
 
-        // Password field with toggle button
+        // Update Password button
         gbc.gridx = 0;
         gbc.gridy = 3;
-        JLabel passwordTitle = new JLabel("Password:");
-        passwordTitle.setFont(LABEL_FONT);
-        passwordTitle.setForeground(TEXT_COLOR);
-        profileCard.add(passwordTitle, gbc);
-
-        gbc.gridx = 1;
-        JPanel passwordPanel = new JPanel(new BorderLayout());
-        passwordPanel.setBackground(CARD_BACKGROUND);
-        
-        passwordLabel = new JLabel();
-        passwordLabel.setFont(VALUE_FONT);
-        passwordLabel.setForeground(TEXT_COLOR);
-        passwordPanel.add(passwordLabel, BorderLayout.CENTER);
-        
-        JButton togglePasswordBtn = new JButton("Show");
-        styleToggleButton(togglePasswordBtn);
-        togglePasswordBtn.addActionListener(e -> togglePasswordVisibility());
-        passwordPanel.add(togglePasswordBtn, BorderLayout.EAST);
-        
-        profileCard.add(passwordPanel, gbc);
-
-        // Edit button
-        gbc.gridx = 0;
-        gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.CENTER;
         gbc.insets = new Insets(20, 0, 0, 0);
         
+        JButton updatePasswordBtn = createStyledButton("Update Password");
+        updatePasswordBtn.addActionListener(e -> showUpdatePasswordDialog());
+        profileCard.add(updatePasswordBtn, gbc);
+
+        // Edit button
+        gbc.gridy = 4;
         JButton editBtn = createStyledButton("Edit Profile");
         editBtn.addActionListener(e -> showEditDialog());
         profileCard.add(editBtn, gbc);
@@ -132,20 +117,6 @@ public class ProfilePage extends JPanel {
         return button;
     }
 
-    private void styleToggleButton(JButton button) {
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        button.setBackground(new Color(220, 220, 220));
-        button.setForeground(TEXT_COLOR);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }
-
-    private void togglePasswordVisibility() {
-        passwordVisible = !passwordVisible;
-        fetchAdminDetails(adminId); // Refresh to show/hide password
-    }
-
     private void showEditDialog() {
         // Implementation for edit dialog
         if(navigationListener != null){
@@ -153,7 +124,101 @@ public class ProfilePage extends JPanel {
         }
     }
 
-        private void fetchAdminDetails(int adminId) {
+    private void showUpdatePasswordDialog() {
+        JDialog passwordDialog = new JDialog((Frame) null, "Update Password", true);
+        passwordDialog.setLayout(new BorderLayout());
+        passwordDialog.setSize(400, 300);
+
+        // Create the dialog content panel
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Old Password
+        // JLabel oldPasswordLabel = new JLabel("Old Password:");
+        // oldPasswordLabel.setFont(LABEL_FONT);
+        // oldPasswordLabel.setForeground(TEXT_COLOR);
+        // JPasswordField oldPasswordField = new JPasswordField();
+        // oldPasswordField.setFont(VALUE_FONT);
+
+        // New Password
+        JLabel newPasswordLabel = new JLabel("New Password:");
+        newPasswordLabel.setFont(LABEL_FONT);
+        newPasswordLabel.setForeground(TEXT_COLOR);
+        JPasswordField newPasswordField = new JPasswordField();
+        newPasswordField.setFont(VALUE_FONT);
+        newPasswordField.setPreferredSize(new Dimension(200, 30));
+
+        // Show password toggle
+        // JButton showPasswordBtn = new JButton("Show Password");
+        // showPasswordBtn.addActionListener(e -> togglePasswordVisibility(oldPasswordField, newPasswordField));
+
+        // Add components to dialog
+        // gbc.gridx = 0;
+        // gbc.gridy = 0;
+        // panel.add(oldPasswordLabel, gbc);
+        // gbc.gridx = 1;
+        // panel.add(oldPasswordField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(newPasswordLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(newPasswordField, gbc);
+        
+
+        // gbc.gridx = 0;
+        // gbc.gridy = 2;
+        // panel.add(showPasswordBtn, gbc);
+
+        // Update button
+        JButton updateBtn = new JButton("Update");
+        updateBtn.setFont(LABEL_FONT);
+        updateBtn.addActionListener(e -> handleUpdatePassword(newPasswordField.getPassword()));
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        panel.add(updateBtn, gbc);
+
+        passwordDialog.add(panel, BorderLayout.CENTER);
+        passwordDialog.setVisible(true);
+    }
+
+    // private void togglePasswordVisibility(JPasswordField oldPasswordField, JPasswordField newPasswordField) {
+    //     char currentEchoChar = oldPasswordField.getEchoChar();
+    //     char newEchoChar = newPasswordField.getEchoChar();
+    //     if (currentEchoChar == '*') {
+    //         oldPasswordField.setEchoChar((char) 0);
+    //         newPasswordField.setEchoChar((char) 0);
+    //     } else {
+    //         oldPasswordField.setEchoChar('*');
+    //         newPasswordField.setEchoChar('*');
+    //     }
+    // }
+
+    private void handleUpdatePassword(char[] newPassword) {
+        String newPasswordStr = new String(newPassword);
+
+        try {
+            // System.out.println(password);
+            InputValidator.validatePassword(newPasswordStr);
+            InputValidator.validatePasswordStrength(newPasswordStr);
+        } catch (InvalidPasswordException | WeakPasswordException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        AdminService service = new AdminService();
+        service.updatePassword(adminId, HashPassword.hashPassword(newPasswordStr));
+
+    }
+
+    private void fetchAdminDetails(int adminId) {
         AdminService service = new AdminService();
         Admin admin = service.getAdminById(adminId);
 
@@ -161,13 +226,6 @@ public class ProfilePage extends JPanel {
             nameLabel.setText(admin.getName());
             emailLabel.setText(admin.getEmail());
             contactLabel.setText(admin.getContactNumber());
-
-            String password = admin.getPassword();
-            if (password != null) {
-                passwordLabel.setText(passwordVisible ? password : "••••••••");
-            } else {
-                passwordLabel.setText("Not set");
-            }
         } else {
             JOptionPane.showMessageDialog(this, "Error loading profile.");
         }

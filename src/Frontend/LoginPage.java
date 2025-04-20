@@ -2,6 +2,7 @@ package Frontend;
 
 import Models.Account;
 import Service.LoginService;
+import Utilities.HashPassword;
 
 import javax.swing.*;
 import Components.LoginNavigationBar;
@@ -132,7 +133,8 @@ public class LoginPage extends JPanel {
 
     private void loginUser() {
         String email = emailField.getText().trim();
-        String password = String.valueOf(passwordField.getPassword()).trim();
+        String passwordRaw = String.valueOf(passwordField.getPassword()).trim();
+        String password = HashPassword.hashPassword(passwordRaw);
 
         if (email.equals(EMAIL_PLACEHOLDER) || password.equals(PASSWORD_PLACEHOLDER) || email.isEmpty() || password.isEmpty()) {
              JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.WARNING_MESSAGE);
