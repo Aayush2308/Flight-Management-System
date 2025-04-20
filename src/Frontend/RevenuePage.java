@@ -1,14 +1,12 @@
 package Frontend;
 
+import Components.ShadowBorder;
+import Interfaces.NavigationListener;
 import Models.Revenue;
 import Service.RevenueService;
-import Components.NavigationBar;
-import Components.ShadowBorder;
-import Components.StyledButton;
-import DBConnection.DBConnection;
-import Interfaces.NavigationListener;
-
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.util.List;
@@ -34,19 +32,26 @@ public class RevenuePage extends JPanel {
 
     // Design constants
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
     private static final Color ACCENT_COLOR = new Color(231, 76, 60);
     private static final Color BACKGROUND_COLOR = new Color(236, 240, 241);
-    private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 32);
     private static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 18);
     private static final Font REGULAR_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+
+    // navbar constants
+    private static final Font FONT_TITLE = new Font("SansSerif", Font.BOLD, 20);
+    private static final Font FONT_NAV_ICONS = new Font("SansSerif", Font.BOLD, 18);
+    private static final Color COLOR_NAVBAR = new Color(30, 30, 30);
+    private static final Color COLOR_TEXT = new Color(220, 220, 220);
+    private static final Color COLOR_BORDER = new Color(80, 80, 80);
 
     public RevenuePage(int adminId, NavigationListener navigationListener) {
         try{
             this.adminId = adminId;
             this.navigationListener = navigationListener;
             revenueService = new RevenueService();
+            JPanel navBar = createNavBar();
+            add(navBar, BorderLayout.NORTH);
             setupMainPanel();
             createComponents();
             layoutComponents();
@@ -58,6 +63,109 @@ public class RevenuePage extends JPanel {
         }
     } 
 
+    private JPanel createNavBar() {
+        JPanel navBar = new JPanel(new BorderLayout());
+        navBar.setBackground(COLOR_NAVBAR);
+        navBar.setPreferredSize(new Dimension(getWidth(), 60));
+        navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER));
+    
+        // --- Left Side: Back Button ---
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.setBackground(COLOR_NAVBAR);
+    
+        JLabel backButton = new JLabel("←");
+        backButton.setFont(FONT_NAV_ICONS);
+        backButton.setForeground(COLOR_TEXT);
+        backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        backButton.setBorder(new EmptyBorder(0, 15, 0, 0));
+        backButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (navigationListener != null) {
+                    navigationListener.navigateTo(new HomePage(adminId, navigationListener));
+                }
+            }
+    
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                backButton.setForeground(Color.WHITE);
+            }
+    
+            @Override
+            public void mouseExited(MouseEvent e) {
+                backButton.setForeground(COLOR_TEXT);
+            }
+        });
+    
+        leftPanel.add(backButton);
+        navBar.add(leftPanel, BorderLayout.WEST);
+    
+        // --- Center: Page Title ---
+        JLabel titleLabel = new JLabel("Revenue Dashboard");
+        titleLabel.setFont(FONT_TITLE);
+        titleLabel.setForeground(COLOR_TEXT);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        navBar.add(titleLabel, BorderLayout.CENTER);
+    
+        // --- Right Side: Logout & Profile ---
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.setBackground(COLOR_NAVBAR);
+    
+        JLabel logoutButton = new JLabel("Logout");
+        logoutButton.setFont(FONT_NAV_ICONS);
+        logoutButton.setForeground(COLOR_TEXT);
+        logoutButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        logoutButton.setBorder(new EmptyBorder(0, 0, 0, 10));
+        logoutButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (navigationListener != null) {
+                    navigationListener.navigateTo("login");
+                }
+            }
+    
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                logoutButton.setForeground(Color.WHITE);
+            }
+    
+            @Override
+            public void mouseExited(MouseEvent e) {
+                logoutButton.setForeground(COLOR_TEXT);
+            }
+        });
+    
+        JLabel profileIcon = new JLabel(" \uD83D\uDC64 ");
+        profileIcon.setFont(FONT_NAV_ICONS);
+        profileIcon.setForeground(COLOR_TEXT);
+        profileIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        profileIcon.setBorder(new EmptyBorder(0, 0, 0, 15));
+        profileIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (navigationListener != null) {
+                    navigationListener.navigateTo(new ProfilePage(adminId, navigationListener));
+                }
+            }
+    
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                profileIcon.setForeground(Color.WHITE);
+            }
+    
+            @Override
+            public void mouseExited(MouseEvent e) {
+                profileIcon.setForeground(COLOR_TEXT);
+            }
+        });
+    
+        rightPanel.add(logoutButton);
+        rightPanel.add(profileIcon);
+        navBar.add(rightPanel, BorderLayout.EAST);
+    
+        return navBar;
+    }
+    
     private void setupMainPanel() {
         setLayout(new BorderLayout(15, 15));
         setBackground(BACKGROUND_COLOR);
@@ -72,7 +180,8 @@ public class RevenuePage extends JPanel {
         contentWrapper.setBorder(ShadowBorder.createShadowBorder());
 
         // Create navbar
-        createNavbar();
+        // createNavbar();
+        add(createNavBar(), BorderLayout.NORTH);
 
         // Create search section
         createSearchSection();
@@ -84,18 +193,19 @@ public class RevenuePage extends JPanel {
         createSummarySection();
     }
 
-    private void createNavbar() {
-        NavigationBar navbar = new NavigationBar("Revenue Dashboard", e -> {
-        // Handle navigation button clicks
-        String command = ((JButton)e.getSource()).getText();
-        if ("←".equals(command)) {
-            if(navigationListener != null){
-                navigationListener.navigateTo(new HomePage(adminId, navigationListener));
-            }
-        }
-    },70);
-    contentWrapper.add(navbar);
-    }
+    //Uses the Component
+    // private void createNavbar() {
+    //     NavigationBar navbar = new NavigationBar("Revenue Dashboard", e -> {
+    //     // Handle navigation button clicks
+    //     String command = ((JButton)e.getSource()).getText();
+    //     if ("←".equals(command)) {
+    //         if(navigationListener != null){
+    //             navigationListener.navigateTo(new HomePage(adminId, navigationListener));
+    //         }
+    //     }
+    // },70);
+    // contentWrapper.add(navbar);
+    // }
 
     private void createSearchSection() {
         JPanel searchPanel = new JPanel();

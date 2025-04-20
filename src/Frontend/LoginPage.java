@@ -1,7 +1,8 @@
 package Frontend;
 
 import Models.Account;
-import Service.AuthService;
+import Service.LoginService;
+
 import javax.swing.*;
 import Components.LoginNavigationBar;
 import Interfaces.NavigationListener;
@@ -14,7 +15,7 @@ public class LoginPage extends JPanel {
     private JTextField emailField;
     private JPasswordField passwordField;
     private NavigationListener navigationListener;
-    private AuthService authService;
+    private LoginService authService;
     private LoginNavigationBar navBar;
 
     // Placeholder text definitions and colors
@@ -25,16 +26,16 @@ public class LoginPage extends JPanel {
 
     public LoginPage(NavigationListener listener) {
         this.navigationListener = listener;
-        this.authService = new AuthService();
+        this.authService = new LoginService();
         initializeUI();
     }
 
     private void initializeUI() {
         setLayout(new BorderLayout());
-        setBackground(new Color(45, 45, 48));
+        setBackground(Color.WHITE);
 
         navBar = new LoginNavigationBar("Login", this::handleNavActions, 70);
-        navBar.setBackground(Color.DARK_GRAY);
+        navBar.setBackground(Color.BLACK);
         add(navBar, BorderLayout.NORTH);
 
         JPanel contentPanel = new JPanel();

@@ -22,11 +22,12 @@ public class NavigationBar extends JPanel {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gradient = new GradientPaint(
-                    0, 0, new Color(41, 128, 185),
-                    getWidth(), 0, new Color(52, 152, 219)
-                );
-                g2d.setPaint(gradient);
+                // GradientPaint gradient = new GradientPaint(
+                //     0, 0, new Color(41, 128, 185),
+                //     getWidth(), 0, new Color(52, 152, 219)
+                // );
+                // g2d.setPaint(gradient);
+                g2d.setColor(Color.black);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 g2d.dispose();
             }
@@ -62,7 +63,6 @@ public class NavigationBar extends JPanel {
 
     private JButton createNavButton(String text) {
         int buttonSize = height * 45 / 70;
-        int fontSize = height * 18 / 70;
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {

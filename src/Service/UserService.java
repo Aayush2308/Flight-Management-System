@@ -2,9 +2,17 @@ package Service;
 
 import DBConnection.DBConnection;
 import java.sql.*;
+import Exception.*;
+import Utilities.InputValidator;
 
 public class UserService {
-    public boolean registerUser(String name, String contact, String email, String password) throws Exception {
+    public boolean registerUser(String name, String contact, String email, String password) throws InvalidEmailException, 
+    InvalidPasswordException, WeakPasswordException, Exception {
+
+        InputValidator.validateEmail(email);
+        InputValidator.validatePassword(password);
+        InputValidator.validatePasswordStrength(password);
+
         try (Connection conn = DBConnection.getConnection()) {
             if (userExists(conn, email)) {
                 throw new Exception("User already exists");

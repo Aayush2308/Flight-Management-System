@@ -1,8 +1,7 @@
 import Frontend.*;
 import Interfaces.NavigationListener;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class App {
     public static void main(String[] args) {
@@ -41,11 +40,14 @@ public class App {
                             case "passenger":
                                 contentPane.add(new PassengerPage(0, this));
                                 break;
-                            case "flight":
-                                contentPane.add(new FlightDetails(0, this));
-                                break;
+                            // case "flight":
+                            //     contentPane.add(new FlightPage());
+                            //     break;
                             case "home":
                                 contentPane.add(new HomePage(0, this)); // default homepage
+                                break;
+                            case "update":
+                                contentPane.add(new UpdateProfilePage(0, this));
                                 break;
                             default:
                                 contentPane.add(new JLabel("Page not found: " + pageName));
