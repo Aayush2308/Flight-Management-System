@@ -1,5 +1,6 @@
 package Frontend;
 
+import Components.ModernHeaderRenderer;
 import Components.NavigationBar;
 import Components.ShadowBorder;
 import Interfaces.NavigationListener;
@@ -224,16 +225,6 @@ public class RevenuePage extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
         
         contentWrapper.add(scrollPane);
-    }
-
-    private class ModernHeaderRenderer extends DefaultTableCellRenderer {
-        public ModernHeaderRenderer() {
-            setHorizontalAlignment(JLabel.LEFT);
-            setFont(HEADER_FONT);
-            setBackground(PRIMARY_COLOR);
-            setForeground(Color.WHITE);
-            setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        }
     }
 
     private void createSummarySection() {
