@@ -1,7 +1,9 @@
 package Frontend;
 
 import DBConnection.DBConnection;
+import Exception.InvalidPhoneNumberException;
 import Interfaces.NavigationListener;
+import Utilities.InputValidator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -169,30 +171,78 @@ public class PassengerPage extends JPanel {
             }
         });
 
-        // Add Passenger
         addBtn.addActionListener(e -> {
-            String name = inputValidated("Enter Name (Only letters)", "[a-zA-Z ]{1,100}", "Invalid name.");
-            if (name == null) return;
+            JTextField nameField = new JTextField(20);
+            JTextField passportField = new JTextField(20);
+            JTextField contactField = new JTextField(20);
+        
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Enter Name (Only letters):"));
+            panel.add(nameField);
+            panel.add(new JLabel("Enter Passport Number:"));
+            panel.add(passportField);
+            panel.add(new JLabel("Enter 10-digit Contact Number:"));
+            panel.add(contactField);
+        
+            int result = JOptionPane.showConfirmDialog(null, panel, "Add New Passenger",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+            if (result == JOptionPane.OK_OPTION) {
+                String name = nameField.getText().trim();
+                String passport = passportField.getText().trim();
+                String contact = contactField.getText().trim();
+        
+                // if (!name.matches("[a-zA-Z ]{1,100}")) {
+                //     JOptionPane.showMessageDialog(null, "Invalid name.");
+                //     return;
+                // }
+        
+                // if (!passport.matches(".{1,50}")) {
+                //     JOptionPane.showMessageDialog(null, "Invalid passport.");
+                //     return;
+                // }
+        
+                // if (!contact.matches("\\d{10}")) {
+                //     JOptionPane.showMessageDialog(null, "Invalid contact number.");
+                //     return;
+                // }
 
-            String passport = inputValidated("Enter Passport Number", ".{1,50}", "Invalid passport.");
-            if (passport == null) return;
+                // if (!inputValidated(name, "[a-zA-Z ]{1,100}", "Invalid name.")) return;
+                // if (!inputValidated(passport, ".{1,50}", "Invalid passport.")) return;
+                // if (!inputValidated(contact, "\\d{10}", "Invalid contact number.")) return;
 
-            String contact = inputValidated("Enter 10-digit Contact Number", "\\d{10}", "Invalid contact.");
-            if (contact == null) return;
+                if (!name.matches("[a-zA-Z ]{1,100}")) {
+                    JOptionPane.showMessageDialog(PassengerPage.this, "Invalid name.");
+                    return;
+                }
 
-            try (Connection con = DBConnection.getConnection();
-                 CallableStatement cs = con.prepareCall("{CALL InsertNewPassenger(?, ?, ?)}")) {
-                cs.setString(1, passport);
-                cs.setString(2, name);
-                cs.setString(3, contact);
-                cs.execute();
-                JOptionPane.showMessageDialog(PassengerPage.this, "Passenger added successfully.");
-                refreshPassengerList();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(PassengerPage.this, "Error adding passenger.");
+                if (!passport.matches(".{1,50}")) {
+                    JOptionPane.showMessageDialog(PassengerPage.this, "Invalid passport.");
+                    return;
+                }
+
+                try {
+                    contact = InputValidator.validatePhoneNumber(contact);
+                } catch (InvalidPhoneNumberException ex) {
+                    JOptionPane.showMessageDialog(PassengerPage.this, ex.getMessage());
+                    return;
+                }
+        
+                try (Connection con = DBConnection.getConnection();
+                     CallableStatement cs = con.prepareCall("{CALL InsertNewPassenger(?, ?, ?)}")) {
+                    cs.setString(1, passport);
+                    cs.setString(2, name);
+                    cs.setString(3, contact);
+                    cs.execute();
+                    JOptionPane.showMessageDialog(PassengerPage.this, "Passenger added successfully.");
+                    refreshPassengerList();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(PassengerPage.this, "Error adding passenger.");
+                }
             }
         });
+        
 
         // Delete Passenger
         deleteBtn.addActionListener(e -> {
@@ -297,15 +347,13 @@ public class PassengerPage extends JPanel {
         return btn;
     }
 
-    private String inputValidated(String message, String regex, String errorMsg) {
-        while (true) {
-            String input = JOptionPane.showInputDialog(PassengerPage.this, message);
-            if (input == null) return null;
-            input = input.trim();
-            if (input.matches(regex)) return input;
-            JOptionPane.showMessageDialog(PassengerPage.this, errorMsg);
-        }
-    }
+    // private boolean inputValidated(String input, String regex, String errorMsg) {
+    //     if (input == null || !input.matches(regex)) {
+    //         JOptionPane.showMessageDialog(PassengerPage.this, errorMsg);
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     private void loadPassengers() {
         tableModel.setRowCount(0);
