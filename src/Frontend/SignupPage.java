@@ -150,7 +150,7 @@ public class SignupPage extends JPanel {
         String name = nameField.getText().trim();
         String contact = contactField.getText().trim();
         String email = emailField.getText().trim();
-        String passwordRaw = passwordField.getText().trim(); // Get text directly from JTextField
+        String passwordRaw = String.valueOf(passwordField.getPassword()).trim(); // Get text directly from JTextField
         String password = HashPassword.hashPassword(passwordRaw);
 
         // Check if fields still contain placeholder text or are empty
