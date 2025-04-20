@@ -40,9 +40,9 @@ public class App {
                             case "passenger":
                                 contentPane.add(new PassengerPage(0, this));
                                 break;
-                            // case "flight":
-                            //     contentPane.add(new FlightPage());
-                            //     break;
+                            case "flight":
+                                contentPane.add(new FlightDetails(0,this));
+                                break;
                             case "home":
                                 contentPane.add(new HomePage(0, this)); // default homepage
                                 break;
