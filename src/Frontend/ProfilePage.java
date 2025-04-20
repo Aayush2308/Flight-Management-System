@@ -1,14 +1,12 @@
 package Frontend;
 
 import Components.NavigationBar;
-import DBConnection.DBConnection;
 import Interfaces.NavigationListener;
 import Models.Admin;
 import Service.AdminService;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.*;
 
 public class ProfilePage extends JPanel {
     private JLabel nameLabel, emailLabel, contactLabel, passwordLabel;

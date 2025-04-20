@@ -80,6 +80,7 @@ public class RevenuePage extends JPanel {
         createSummarySection();
     }
 
+    //Uses the Component
     private void createNavbar() {
         NavigationBar navbar = new NavigationBar("Revenue Dashboard", e -> {
         // Handle navigation button clicks
