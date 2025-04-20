@@ -13,7 +13,10 @@ public class InputValidator {
             throw new InvalidPasswordException("Password contains invalid special characters. Only '@' and '_' are allowed.");
         }
     }
+    
     public static void validatePasswordStrength(String password) throws WeakPasswordException {
+        System.out.println("DEBUG: Password received = '" + password + "'");
+        
         if (password.length() < 6)
             throw new WeakPasswordException("Password must be at least 6 characters long.");
         if (!password.matches(".*[A-Z].*"))
@@ -23,6 +26,7 @@ public class InputValidator {
         if (!password.contains("@") && !password.contains("_"))
             throw new WeakPasswordException("Password must contain '@' or '_'.");
     }
+    
     public static String validatePhoneNumber(String number) throws InvalidPhoneNumberException {
         if (number == null) {
             throw new InvalidPhoneNumberException("Phone number cannot be null.");

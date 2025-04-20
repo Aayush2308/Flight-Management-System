@@ -3,6 +3,7 @@ package Service;
 import DBConnection.DBConnection;
 import java.sql.*;
 import Exception.*;
+import Utilities.HashPassword;
 import Utilities.InputValidator;
 
 public class UserService {
@@ -13,6 +14,8 @@ public class UserService {
         InputValidator.validatePassword(password);
         InputValidator.validatePasswordStrength(password);
 
+        String hashedPassword = HashPassword.hashPassword(password);
+
         try (Connection conn = DBConnection.getConnection()) {
             if (userExists(conn, email)) {
                 throw new Exception("User already exists");
@@ -21,7 +24,7 @@ public class UserService {
             String query = "INSERT INTO admin (name, password, email, contactNumber) VALUES (?, ?, ?, ?)";
             try (PreparedStatement insert = conn.prepareStatement(query)) {
                 insert.setString(1, name);
-                insert.setString(2, password); // Note: Should be hashed in production
+                insert.setString(2, hashedPassword); // Note: Should be hashed in production
                 insert.setString(3, email);
                 insert.setString(4, contact);
                 return insert.executeUpdate() > 0;

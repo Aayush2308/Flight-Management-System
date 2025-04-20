@@ -1,13 +1,7 @@
 package Frontend;
 
 import Service.UserService;
-import Utilities.HashPassword;
-import Utilities.InputValidator;
 import Components.NavigationBar;
-import Exception.InvalidEmailException;
-import Exception.InvalidPasswordException;
-import Exception.WeakPasswordException;
-
 // Removed import Utilities.PlaceholderUtils; // No longer using PlaceholderUtils
 import javax.swing.*;
 import Interfaces.NavigationListener;
@@ -20,7 +14,7 @@ import javax.swing.event.DocumentListener;
 
 public class SignupPage extends JPanel {
     private JTextField nameField, contactField, emailField;
-    private JPasswordField passwordField; // Changed from JPasswordField to JTextField
+    private JTextField passwordField; // Changed from JPasswordField to JTextField
     private NavigationListener navigationListener;
     private UserService userService;
     private NavigationBar navBar;
@@ -150,27 +144,19 @@ public class SignupPage extends JPanel {
         String name = nameField.getText().trim();
         String contact = contactField.getText().trim();
         String email = emailField.getText().trim();
-        String passwordRaw = String.valueOf(passwordField.getPassword()).trim(); // Get text directly from JTextField
-        String password = HashPassword.hashPassword(passwordRaw);
-
+        String passwordRaw = passwordField.getText().trim(); // Get text directly from JTextField
+        
+        System.out.println(passwordRaw);
+        
         // Check if fields still contain placeholder text or are empty
-        if (name.equals(NAME_PLACEHOLDER) || contact.equals(CONTACT_PLACEHOLDER) || email.equals(EMAIL_PLACEHOLDER) || passwordRaw.equals(PASSWORD_PLACEHOLDER) || name.isEmpty() || contact.isEmpty() || email.isEmpty() || password.isEmpty()) {
-             JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.WARNING_MESSAGE);
-             return;
-         }
-
-         try {
-            InputValidator.validateEmail(email);
-            InputValidator.validatePassword(passwordRaw);
-            InputValidator.validatePasswordStrength(passwordRaw);
-        } catch (InvalidEmailException | InvalidPasswordException | WeakPasswordException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+        if (name.equals(NAME_PLACEHOLDER) || contact.equals(CONTACT_PLACEHOLDER) || email.equals(EMAIL_PLACEHOLDER) || passwordRaw.equals(PASSWORD_PLACEHOLDER) || name.isEmpty() || contact.isEmpty() || email.isEmpty() || passwordRaw.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+        
         try {
             // Pass the visible password string to the service
-            if (userService.registerUser(name, contact, email, password)) {
+            if (userService.registerUser(name, contact, email, passwordRaw)) {
                 JOptionPane.showMessageDialog(this, "Signup Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 if (navigationListener != null) {
                     navigationListener.navigateTo("login");
