@@ -40,7 +40,7 @@ public class PassengerPage extends JPanel {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(1100, 650));
 
-        NavigationBar navBar = new NavigationBar("Profile", e -> navigationListener.navigateTo(new HomePage(adminId, navigationListener)), 70);
+        NavigationBar navBar = new NavigationBar("Passenger", e -> navigationListener.navigateTo(new HomePage(adminId, navigationListener)), 70);
         add(navBar, BorderLayout.NORTH);
 
         cardLayout = new CardLayout();
@@ -191,25 +191,6 @@ public class PassengerPage extends JPanel {
                 String name = nameField.getText().trim();
                 String passport = passportField.getText().trim();
                 String contact = contactField.getText().trim();
-        
-                // if (!name.matches("[a-zA-Z ]{1,100}")) {
-                //     JOptionPane.showMessageDialog(null, "Invalid name.");
-                //     return;
-                // }
-        
-                // if (!passport.matches(".{1,50}")) {
-                //     JOptionPane.showMessageDialog(null, "Invalid passport.");
-                //     return;
-                // }
-        
-                // if (!contact.matches("\\d{10}")) {
-                //     JOptionPane.showMessageDialog(null, "Invalid contact number.");
-                //     return;
-                // }
-
-                // if (!inputValidated(name, "[a-zA-Z ]{1,100}", "Invalid name.")) return;
-                // if (!inputValidated(passport, ".{1,50}", "Invalid passport.")) return;
-                // if (!inputValidated(contact, "\\d{10}", "Invalid contact number.")) return;
 
                 if (!name.matches("[a-zA-Z ]{1,100}")) {
                     JOptionPane.showMessageDialog(PassengerPage.this, "Invalid name.");
@@ -346,14 +327,6 @@ public class PassengerPage extends JPanel {
         
         return btn;
     }
-
-    // private boolean inputValidated(String input, String regex, String errorMsg) {
-    //     if (input == null || !input.matches(regex)) {
-    //         JOptionPane.showMessageDialog(PassengerPage.this, errorMsg);
-    //         return false;
-    //     }
-    //     return true;
-    // }
 
     private void loadPassengers() {
         tableModel.setRowCount(0);

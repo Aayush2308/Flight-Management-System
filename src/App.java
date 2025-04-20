@@ -41,7 +41,7 @@ public class App {
                                 contentPane.add(new PassengerPage(0, this));
                                 break;
                             case "flight":
-                                contentPane.add(new FlightDetails(0,this));
+                                contentPane.add(new FlightPage(0,this));
                                 break;
                             case "home":
                                 contentPane.add(new HomePage(0, this)); // default homepage
@@ -66,7 +66,7 @@ public class App {
                 };
 
                 // Initial screen
-                contentPane.add(new LoginPage(listener[0]));
+                contentPane.add(new RevenuePage(1, listener[0]));
 
                 frame.setVisible(true);
             });

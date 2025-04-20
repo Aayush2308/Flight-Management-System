@@ -13,7 +13,7 @@ import java.awt.event.*;
 import java.sql.*;
 import java.util.Vector;
 
-public class FlightDetails extends JPanel {
+public class FlightPage extends JPanel {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JTable table;
@@ -35,7 +35,7 @@ public class FlightDetails extends JPanel {
     private final Font font = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font titleFont = new Font("Segoe UI Semibold", Font.BOLD, 24);
 
-    public FlightDetails(int adminId, NavigationListener navigationListener) {
+    public FlightPage(int adminId, NavigationListener navigationListener) {
         this.adminId = adminId;
         this.navigationListener = navigationListener;
         
@@ -49,7 +49,7 @@ public class FlightDetails extends JPanel {
         JButton backButton = createBackButton();
         topPanel.add(backButton, BorderLayout.WEST);
         
-        JLabel title = new JLabel("Flight Management");
+        JLabel title = new JLabel("Flight");
         title.setFont(titleFont);
         title.setForeground(white);
         title.setHorizontalAlignment(SwingConstants.CENTER);
@@ -221,7 +221,7 @@ public class FlightDetails extends JPanel {
 
         // Delete Flight
         deleteBtn.addActionListener(e -> {
-            String flightId = JOptionPane.showInputDialog(FlightDetails.this, "Enter Flight ID to Delete:");
+            String flightId = JOptionPane.showInputDialog(FlightPage.this, "Enter Flight ID to Delete:");
             if (flightId == null || flightId.isEmpty()) return;
 
             try (Connection con = DBConnection.getConnection();
@@ -229,16 +229,16 @@ public class FlightDetails extends JPanel {
                 ps.setInt(1, Integer.parseInt(flightId));
                 int rows = ps.executeUpdate();
                 if (rows > 0) {
-                    JOptionPane.showMessageDialog(FlightDetails.this, "Flight deleted successfully.");
+                    JOptionPane.showMessageDialog(FlightPage.this, "Flight deleted successfully.");
                     loadFlights();
                 } else {
-                    JOptionPane.showMessageDialog(FlightDetails.this, "No flight found with that ID.");
+                    JOptionPane.showMessageDialog(FlightPage.this, "No flight found with that ID.");
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(FlightDetails.this, "Error deleting flight.");
+                JOptionPane.showMessageDialog(FlightPage.this, "Error deleting flight.");
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(FlightDetails.this, "Please enter a valid Flight ID number.");
+                JOptionPane.showMessageDialog(FlightPage.this, "Please enter a valid Flight ID number.");
             }
         });
     }
@@ -247,14 +247,28 @@ public class FlightDetails extends JPanel {
         JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10));
         formPanel.setBackground(darkPanel);
         formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
 
         JTextField flightIdField = new JTextField();
-        JTextField runwayField = new JTextField();
+        // JTextField runwayField = new JTextField();
+        JComboBox<Integer> runwayField = new JComboBox<>();
         JTextField iadaField = new JTextField();
         JTextField sourceField = new JTextField();
         JTextField destinationField = new JTextField();
         JTextField departureField = new JTextField();
         JTextField arrivalField = new JTextField();
+
+        try (Connection con = DBConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement("SELECT runwayNumber FROM runway");
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            runwayField.addItem(rs.getInt("runwayNumber"));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Failed to load runway numbers: " + e.getMessage(),
+                "Database Error", JOptionPane.ERROR_MESSAGE);
+    }
 
         formPanel.add(createFormLabel("Flight ID:"));
         formPanel.add(flightIdField);
@@ -300,7 +314,7 @@ public class FlightDetails extends JPanel {
         submitBtn.addActionListener(e -> {
             try {
                 int flightId = Integer.parseInt(flightIdField.getText());
-                int runway = Integer.parseInt(runwayField.getText());
+                int runway = (Integer) runwayField.getSelectedItem();
                 String iada = iadaField.getText();
                 String source = sourceField.getText();
                 String destination = destinationField.getText();
@@ -333,21 +347,21 @@ public class FlightDetails extends JPanel {
                         psSchedule.executeUpdate();
                     }
 
-                    JOptionPane.showMessageDialog(FlightDetails.this, "Flight added successfully!");
+                    JOptionPane.showMessageDialog(FlightPage.this, "Flight added successfully!");
                     loadFlights();
                     dialog.dispose();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(FlightDetails.this, 
+                    JOptionPane.showMessageDialog(FlightPage.this, 
                             "Error adding flight: " + ex.getMessage(), 
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(FlightDetails.this, 
+                JOptionPane.showMessageDialog(FlightPage.this, 
                         "Flight ID and Runway must be numbers", 
                         "Input Error", JOptionPane.ERROR_MESSAGE);
             } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(FlightDetails.this, 
+                JOptionPane.showMessageDialog(FlightPage.this, 
                         ex.getMessage(), 
                         "Input Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -525,7 +539,7 @@ public class FlightDetails extends JPanel {
                 cardLayout.show(mainPanel, "DetailView");
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(FlightDetails.this, "Error retrieving flight details.");
+                JOptionPane.showMessageDialog(FlightPage.this, "Error retrieving flight details.");
             }
         }
     }
