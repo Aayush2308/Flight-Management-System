@@ -1,7 +1,8 @@
 import Frontend.*;
 import Interfaces.NavigationListener;
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
+import Utilities.AppNavigator;
 
 public class App {
     public static void main(String[] args) {
@@ -14,59 +15,13 @@ public class App {
                 frame.setSize(850, 600);
                 frame.setLocationRelativeTo(null);
 
-                // Panel to hold dynamic content
                 Container contentPane = frame.getContentPane();
 
-                final NavigationListener[] listener = new NavigationListener[1];
+                // Use the new AppNavigator class
+                NavigationListener listener = new AppNavigator(contentPane);
 
-                // Define the NavigationListener logic
-                listener[0] = new NavigationListener() {
-                    @Override
-                    public void navigateTo(String pageName) {
-                        contentPane.removeAll();
-                        switch (pageName.toLowerCase()) {
-                            case "login":
-                                contentPane.add(new LoginPage(this));
-                                break;
-                            case "signup":
-                                contentPane.add(new SignupPage(this));
-                                break;
-                            case "employee":
-                                contentPane.add(new EmployeePage(0, this));
-                                break;
-                            case "revenue":
-                                contentPane.add(new RevenuePage(0, this));
-                                break;
-                            case "passenger":
-                                contentPane.add(new PassengerPage(0, this));
-                                break;
-                            case "flight":
-                                contentPane.add(new FlightPage(0,this));
-                                break;
-                            case "home":
-                                contentPane.add(new HomePage(0, this)); // default homepage
-                                break;
-                            case "update":
-                                contentPane.add(new UpdateProfilePage(0, this));
-                                break;
-                            default:
-                                contentPane.add(new JLabel("Page not found: " + pageName));
-                        }
-                        contentPane.revalidate();
-                        contentPane.repaint();
-                    }
-
-                    @Override
-                    public void navigateTo(JPanel panel) {
-                        contentPane.removeAll();
-                        contentPane.add(panel);
-                        contentPane.revalidate();
-                        contentPane.repaint();
-                    }
-                };
-
-                // Initial screen
-                contentPane.add(new LoginPage(listener[0]));
+                // Set the initial screen
+                contentPane.add(new LoginPage(listener));
 
                 frame.setVisible(true);
             });
