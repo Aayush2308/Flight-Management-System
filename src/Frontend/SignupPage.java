@@ -60,7 +60,6 @@ public class SignupPage extends JPanel {
 
         // Password Field - now a JTextField
         passwordField = createTextField(PASSWORD_PLACEHOLDER);
-        // addManualPlaceholder(passwordField, PASSWORD_PLACEHOLDER); // Use manual placeholder logic
 
         contentPanel.add(passwordField); contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
