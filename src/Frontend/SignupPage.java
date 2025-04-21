@@ -2,7 +2,6 @@ package Frontend;
 
 import Service.UserService;
 import Components.NavigationBar;
-// Removed import Utilities.PlaceholderUtils; // No longer using PlaceholderUtils
 import javax.swing.*;
 import Interfaces.NavigationListener;
 import java.awt.*;
@@ -14,7 +13,7 @@ import javax.swing.event.DocumentListener;
 
 public class SignupPage extends JPanel {
     private JTextField nameField, contactField, emailField;
-    private JTextField passwordField; // Changed from JPasswordField to JTextField
+    private JTextField passwordField;
     private NavigationListener navigationListener;
     private UserService userService;
     private NavigationBar navBar;
@@ -23,7 +22,7 @@ public class SignupPage extends JPanel {
     private static final String NAME_PLACEHOLDER = "Name";
     private static final String CONTACT_PLACEHOLDER = "Contact Number";
     private static final String EMAIL_PLACEHOLDER = "Email";
-    private static final String PASSWORD_PLACEHOLDER = "Password"; // Placeholder text remains
+    private static final String PASSWORD_PLACEHOLDER = "Password";
     private Color placeholderColor = Color.GRAY.brighter();
     private Color textColor = Color.WHITE;
 
@@ -60,11 +59,8 @@ public class SignupPage extends JPanel {
         contentPanel.add(emailField); contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Password Field - now a JTextField
-        passwordField = new JPasswordField(); // Instantiated as JTextField
-        passwordField.setMaximumSize(new Dimension(300, 40));
-        passwordField.setBackground(new Color(50, 50, 50));
-        passwordField.setCaretColor(Color.WHITE);
-        addManualPlaceholder(passwordField, PASSWORD_PLACEHOLDER); // Use manual placeholder logic
+        passwordField = createTextField(PASSWORD_PLACEHOLDER);
+        // addManualPlaceholder(passwordField, PASSWORD_PLACEHOLDER); // Use manual placeholder logic
 
         contentPanel.add(passwordField); contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
@@ -92,7 +88,7 @@ public class SignupPage extends JPanel {
         field.setBackground(new Color(50, 50, 50));
         field.setCaretColor(Color.WHITE);
 
-        addManualPlaceholder(field, placeholderText); // Use manual placeholder
+        addManualPlaceholder(field, placeholderText);
 
         return field;
     }
