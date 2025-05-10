@@ -36,4 +36,4 @@ This system ensures a comprehensive and granular understanding of each flight’
 
 ---
 
-> Developed as part of an academic project submission under Group A6.
+> Developed as part of an academic project submission. 
