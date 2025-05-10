@@ -1,14 +1,5 @@
 # ✈️ Flight Management System
 
-## 👥 Group A6 Members
-
-| Name            | PRN          | Class  |
-|-----------------|--------------|--------|
-| Abhilaksh Saini | 23070122011  | CS-A1  |
-| Abhay Pandey    | 23070122010  | CS-A1  |
-| Aayush Joshi    | 23070122008  | CS-A1  |
-| Aman Vats       | 23070122025  | CS-A1  |
-
 ---
 
 ## 📘 About the Project
