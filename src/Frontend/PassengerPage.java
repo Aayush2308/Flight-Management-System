@@ -224,18 +224,10 @@ public class PassengerPage extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String ticketNumber = JOptionPane.showInputDialog("Enter Ticket Number to Delete:");
                 if (ticketNumber != null && !ticketNumber.trim().isEmpty()) {
-                    DefaultTableModel model = (DefaultTableModel) table.getModel(); // 🔧 this line resolves the model error
-                    boolean found = false;
-                    for (int i = 0; i < model.getRowCount(); i++) {
-                        if (model.getValueAt(i, 1).toString().equalsIgnoreCase(ticketNumber.trim())) {
-                            model.removeRow(i);
-                            JOptionPane.showMessageDialog(null, "Passenger deleted successfully.");
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        JOptionPane.showMessageDialog(null, "Ticket number not found.");
+                    try{
+                        passengerService.deletePassenger(ticketNumber);
+                    } catch(Exception ex){
+                        ex.printStackTrace();
                     }
                 }
             }
